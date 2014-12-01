@@ -68,7 +68,16 @@
     self.callbackId = command.callbackId;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationsUpdatedNotification:) name:Bit6ConversationsUpdatedNotification object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messagesUpdatedNotification:) name:Bit6MessagesUpdatedNotification object:nil];
 }
+
+
+- (void) messagesUpdatedNotification:(NSNotification*)notification
+{
+    NSLog(@"Info: Received messagesUpdatedNotification");
+}
+
 
 - (void) conversationsUpdatedNotification:(NSNotification*)notification
 {

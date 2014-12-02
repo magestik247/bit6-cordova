@@ -38,6 +38,7 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
+        alert("Device READY");
         $("#signup").click(function(){
             bit6.register($("#username").val(), "111", function(success){
                 alert(JSON.stringify(success));
@@ -50,15 +51,25 @@ var app = {
         $("#login").click(function(){
            bit6.logout();
 
-           bit6.login($("#username").val(), "111", function(success){
+           bit6.login($("#username").val(), "aaa", function(success){
                console.log(JSON.stringify(success));
            }, function(error){
              alert(JSON.stringify(error));
            });
         });
 
+        $("#call").click(function(){
+           
+
+           bit6.startCall("nar2", false, function(success){
+               console.log(JSON.stringify(success));
+           }, function(error){
+             alert("Error on call" + JSON.stringify(error));
+           });
+        });
+
         $("#sendMessage").click(function(){
-            bit6.sendPushMessage($("#message").val(), "telerik", function(success){
+            bit6.sendPushMessage($("#message").val(), "nar2", function(success){
               console.log(JSON.stringify(success));
             }, function(error){
               alert(JSON.stringify(error));

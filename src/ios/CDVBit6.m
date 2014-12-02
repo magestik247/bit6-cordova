@@ -10,7 +10,7 @@
     NSString *password = [command.arguments objectAtIndex:1];
 
 
-    Bit6Address *identity = [[Bit6Address alloc] initWithKind:Bit6AddressKind_USERNAME value:username];
+    Bit6Address *identity = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:username];
 
     [Bit6Session signUpWithUserIdentity:identity password:password completionHandler:^(NSDictionary *response, NSError *error) {
          [self processCommandWithResult:command response:response error:error];
@@ -22,7 +22,7 @@
     NSString *username = [command.arguments objectAtIndex:0];
     NSString *password = [command.arguments objectAtIndex:1];
 
-    Bit6Address *identity = [[Bit6Address alloc] initWithKind:Bit6AddressKind_USERNAME value:username];
+    Bit6Address *identity = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:username];
 
     [Bit6Session loginWithUserIdentity:identity password:password completionHandler:^(NSDictionary *response, NSError *error) {
         [self processCommandWithResult:command response:response error:error];
@@ -44,6 +44,19 @@
         [self processCommandWithResult:command response:[NSDictionary dictionaryWithObjectsAndKeys:@(NO), @"connected", nil] error:nil];
 }
 
+- (void)startCallToAddress:(CDVInvokedUrlCommand*)command
+{   
+    NSString *to = [command.arguments objectAtIndex:0]; 
+    //TOOD: Should support all kinds, not only username.
+    Bit6Address *address = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:to];
+
+    BOOL hasVideo = [command.arguments objectAtIndex:1];
+
+     NSLog(@"Starting CAll...");
+
+    [Bit6 startCallToAddress:address hasVideo:hasVideo];
+}
+
 - (void)sendMessage:(CDVInvokedUrlCommand*)command
 {
     NSString *message = [command.arguments objectAtIndex:0];
@@ -55,7 +68,7 @@
 
     Bit6MessageChannel channel = (Bit6MessageChannel)[command.arguments objectAtIndex:2];
 
-    bit6Message.destination = [[Bit6Address alloc] initWithKind:Bit6AddressKind_USERNAME value:to];
+    bit6Message.destination = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:to];
     bit6Message.channel = channel;
 
     [bit6Message sendWithCompletionHandler:^(NSDictionary *response, NSError *error) {
@@ -70,12 +83,20 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationsUpdatedNotification:) name:Bit6ConversationsUpdatedNotification object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messagesUpdatedNotification:) name:Bit6MessagesUpdatedNotification object:nil];
+
+     NSLog(@"Starting listening..");
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(typingDidBeginRtNotification:) name:Bit6TypingDidBeginRtNotification object:nil];
 }
 
 
 - (void) messagesUpdatedNotification:(NSNotification*)notification
 {
     NSLog(@"Info: Received messagesUpdatedNotification");
+}
+
+- (void) typingDidBeginRtNotification:(NSNotification*)notification
+{
+    NSLog(@"Info: Received Typing Notification");    
 }
 
 

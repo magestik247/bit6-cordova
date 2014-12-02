@@ -24,6 +24,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
     <framework src="libicucore.dylib"/>
     <framework src="libz.dylib"/>
+    <framework src="libsqlite3.dylib"/>
+    <framework src="libstdc++.dylib"/>
+    <framework src="libstdc++.6.0.9.dylib"/>
 
     <framework src="GLKit.framework"/>
 

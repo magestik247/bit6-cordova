@@ -49,11 +49,7 @@
     NSString *to = [command.arguments objectAtIndex:0]; 
     //TOOD: Should support all kinds, not only username.
     Bit6Address *address = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:to];
-
-    BOOL hasVideo = [command.arguments objectAtIndex:1];
-
-     NSLog(@"Starting CAll...");
-
+    BOOL hasVideo = [[command.arguments objectAtIndex:1] boolValue];
     [Bit6 startCallToAddress:address hasVideo:hasVideo];
 }
 

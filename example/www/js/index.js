@@ -40,33 +40,46 @@ var app = {
     onDeviceReady: function() {
         alert("Device READY");
         $("#signup").click(function(){
-            bit6.register($("#username").val(), "111", function(success){
-                alert(JSON.stringify(success));
+            bit6.register($("#username").val(), $("#password").val(), function(success){
+                alert("Success:" + JSON.stringify(success));
             }
             , function(error){
-              alert(JSON.stringify(error));
+              alert("Error:" + JSON.stringify(error));
             });
         });
 
         $("#login").click(function(){
            bit6.logout();
 
-           bit6.login($("#username").val(), "aaa", function(success){
+           bit6.login($("#username").val(), $("#password").val(), function(success){
                console.log(JSON.stringify(success));
+               switchToChatScreen();
            }, function(error){
-             alert(JSON.stringify(error));
+             alert("Error: " + JSON.stringify(error));
            });
         });
 
-        $("#call").click(function(){
-           
-
-           bit6.startCall("nar2", false, function(success){
+        $("#voiceCall").click(function(){
+           var opts = { video : false};
+           //FIXME: get current username
+           bit6.startCall("nar2", opts, function(success){
                console.log(JSON.stringify(success));
            }, function(error){
              alert("Error on call" + JSON.stringify(error));
            });
         });
+
+        $("#videoCall").click(function(){
+           var opts = { video : true};
+           //FIXME: get current username
+           bit6.startCall("nar2", opts, function(success){
+               console.log(JSON.stringify(success));
+           }, function(error){
+             alert("Error on call" + JSON.stringify(error));
+           });
+        });
+
+
 
         $("#sendMessage").click(function(){
             bit6.sendPushMessage($("#message").val(), "nar2", function(success){
@@ -87,11 +100,16 @@ var app = {
               displayName = "Me";
             }
 
-
             div.append("<h3>" + displayName + "</h3>");
             div.append("<p>" + e.messages[index].content + "</p>");
             $("#incoming").append($(div).html());
-
         }
     }
 };
+
+function switchToChatScreen() {
+  var loginScreen = $("#loginScreen")[0];
+  loginScreen.style.display = "none";
+  var chatScreen = $("#chatScreen")[0];
+  chatScreen.style.display = "block";
+}

@@ -9,6 +9,7 @@
 - (void)isConnected:(CDVInvokedUrlCommand*)command;
 - (void)startCallToAddress:(CDVInvokedUrlCommand*)command;
 - (void)sendMessage:(CDVInvokedUrlCommand*)command;
+- (void)conversations:(CDVInvokedUrlCommand*)command;
 
 - (void)startListening:(CDVInvokedUrlCommand*)command;
 - (void)stopListen:(CDVInvokedUrlCommand*)command;

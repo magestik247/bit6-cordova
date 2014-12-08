@@ -44,9 +44,39 @@
         [self processCommandWithResult:command response:[NSDictionary dictionaryWithObjectsAndKeys:@(NO), @"connected", nil] error:nil];
 }
 
+- (void)conversations:(CDVInvokedUrlCommand*)command
+{
+   self.callbackId = command.callbackId;
+   NSArray *conversations = [Bit6 conversations];
+
+    if ([conversations count]){
+
+        NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:[conversations count]];
+
+        for (Bit6Conversation * convers in conversations){
+            NSLog(@"processing conv- %@", convers.displayName);
+            NSMutableDictionary *mutableDictionary = [[NSMutableDictionary alloc] init];
+
+            //TODO: Include all needed data
+            [mutableDictionary setObject:convers.displayName forKey:@"displayName"];
+
+            [mutableArray addObject:mutableDictionary];
+        }
+
+        NSDictionary *data = [NSDictionary dictionaryWithObject:mutableArray forKey:@"conversations"];
+
+        if (self.callbackId) {
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+            [result setKeepCallbackAsBool:YES];
+            [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+        }
+    }
+}
+
+
 - (void)startCallToAddress:(CDVInvokedUrlCommand*)command
-{   
-    NSString *to = [command.arguments objectAtIndex:0]; 
+{
+    NSString *to = [command.arguments objectAtIndex:0];
     //TOOD: Should support all kinds, not only username.
     Bit6Address *address = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:to];
     BOOL hasVideo = [[command.arguments objectAtIndex:1] boolValue];
@@ -80,10 +110,8 @@
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messagesUpdatedNotification:) name:Bit6MessagesUpdatedNotification object:nil];
 
-     NSLog(@"Starting listening..");
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(typingDidBeginRtNotification:) name:Bit6TypingDidBeginRtNotification object:nil];
 }
-
 
 - (void) messagesUpdatedNotification:(NSNotification*)notification
 {
@@ -92,7 +120,7 @@
 
 - (void) typingDidBeginRtNotification:(NSNotification*)notification
 {
-    NSLog(@"Info: Received Typing Notification");    
+    NSLog(@"Info: Received Typing Notification");
 }
 
 

@@ -34,6 +34,10 @@ Bit6.prototype.isConnected = function(success, error){
   exec(success, error, "Bit6", "isConnected", null);
 }
 
+Bit6.prototype.conversations = function(success, error){
+  exec(success, error, "Bit6", "conversations", null);
+}
+
 //opts = { video: true/false, ... }
 //For now only video flag is used, but keeping a generic interface similar to JS SDK
 //This can be extended later.

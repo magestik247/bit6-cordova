@@ -38,7 +38,7 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
-        alert("Device READY");
+        //alert("Device READY");
         $("#signup").click(function(){
             bit6.register($("#username").val(), $("#password").val(), function(success){
                 alert("Success:" + JSON.stringify(success));
@@ -79,7 +79,22 @@ var app = {
            });
         });
 
-
+       //TODO: Use conversations api in proper way. This is just for testing
+        $("#getConv").click(function() {
+            bit6.conversations(
+            function(data){
+                var listToDisplay = "Convsersatioins: \n ";
+                for (var i = 0; i < data.conversations.length; ++i) {
+                  console.log(data.conversations[i].displayName);
+                  listToDisplay = listToDisplay.concat(data.conversations[i].displayName).concat("\n");
+                }
+                console.log(data);
+                alert(listToDisplay);
+            },
+            function(error){
+              alert("Error on getting conv" + error);
+            });
+        });
 
         $("#sendMessage").click(function(){
             bit6.sendPushMessage($("#message").val(), "nar2", function(success){
@@ -89,6 +104,14 @@ var app = {
             });
         });
 
+        bit6.isConnected(
+            function(success){
+                console.log(success);
+                switchToChatScreen();
+            },
+            function(error){
+              alert("Error on isConnected api call");
+            });
     },
     onMessageReceived : function(e){
       $("#incoming").html("");

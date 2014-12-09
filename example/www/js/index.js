@@ -16,8 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+var currentChatUri = "";
+
 var app = {
     // Application Constructor
+
 
     //cordova plugins add ~/Source/Telerik/Plugins/Bit6/Plugin/ --variable API_KEY=308x-3bnqo
 
@@ -39,7 +43,53 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         //alert("Device READY");
-        $("#signup").click(function(){
+
+        initButtonListeners();
+
+        bit6.isConnected(
+            function(response){
+                console.log(response);
+                if (response.connected)
+                 switchToChatScreen();
+            },
+            function(error){
+              alert("Error on isConnected api call");
+            });
+
+         bit6.conversations(
+            function(data){
+                var listToDisplay = "Convsersatioins: \n ";
+                for (var i = 0; i < data.conversations.length; ++i) {
+                  console.log(data.conversations[i].displayName);
+                  listToDisplay = listToDisplay.concat(data.conversations[i].displayName).concat("\n");
+                  populateChatList(data.conversations);
+                }
+                //alert(listToDisplay);
+            },
+            function(error){
+              alert("Error on getting conv" + error);
+            });
+
+    },
+    onMessageReceived : function(e){
+      $("#incoming").html("");
+
+      for(var index = 0; index < e.messages.length;index++){
+            var div = $("<div/>");
+            var displayName = e.messages[index].other.displayName;
+            if (!e.messages[index].incoming){
+              displayName = "Me";
+            }
+
+            div.append("<h3>" + displayName + "</h3>");
+            div.append("<p>" + e.messages[index].content + "</p>");
+            $("#incoming").append($(div).html());
+        }
+    }
+};
+
+function initButtonListeners() {
+  $("#signup").click(function(){
             bit6.register($("#username").val(), $("#password").val(), function(success){
                 alert("Success:" + JSON.stringify(success));
             }
@@ -53,7 +103,7 @@ var app = {
 
            bit6.login($("#username").val(), $("#password").val(), function(success){
                console.log(JSON.stringify(success));
-               switchToChatScreen();
+               switchToChatListScreen();
            }, function(error){
              alert("Error: " + JSON.stringify(error));
            });
@@ -103,36 +153,47 @@ var app = {
               alert(JSON.stringify(error));
             });
         });
+}
 
-        bit6.isConnected(
-            function(success){
-                console.log(success);
-                switchToChatScreen();
-            },
-            function(error){
-              alert("Error on isConnected api call");
-            });
-    },
-    onMessageReceived : function(e){
-      $("#incoming").html("");
-
-      for(var index = 0; index < e.messages.length;index++){
-            var div = $("<div/>");
-            var displayName = e.messages[index].other.displayName;
-            if (!e.messages[index].incoming){
-              displayName = "Me";
-            }
-
-            div.append("<h3>" + displayName + "</h3>");
-            div.append("<p>" + e.messages[index].content + "</p>");
-            $("#incoming").append($(div).html());
+function populateChatList(conversations) {
+    var chatList = $('#chatListScreen').html('');
+    for(var i=0; i < conversations.length; i++) {
+        var c = conversations[i];
+        if (!currentChatUri) {
+            currentChatUri = c.uri;
         }
+
+        var d = new Date(c.updated);
+        var stamp = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+        var latestText = 'latestText example';
+
+        // // Find the latest message in the conversation
+        if (c.messages && c.messages.length > 0) {
+            console.log("Lookin on messages --- ");
+            console.log(c.content);
+            var latestMsg = c.messages[c.messages.length-1];
+            // Show the text from the latest conversation
+            //if (latestMsg.content)
+                latestText = latestMsg.content;
+        }
+        chatList.append(
+            $('<div />')
+                .append($('<strong>' + c.title + '</strong>'))
+                .append($('<span>' + latestText + '</span>'))
+                .append($('<em>' + stamp + '</em>'))
+        );
     }
-};
+}
 
 function switchToChatScreen() {
   var loginScreen = $("#loginScreen")[0];
   loginScreen.style.display = "none";
   var chatScreen = $("#chatScreen")[0];
   chatScreen.style.display = "block";
+}
+
+function switchToChatListScreen() {
+  $("#loginScreen")[0].style.display = "none";
+  $("#chatScreen")[0].style.display = "none";
+  $("#chatListScreen")[0].style.display = "block";
 }

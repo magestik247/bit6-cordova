@@ -46,7 +46,7 @@
 
 - (void)conversations:(CDVInvokedUrlCommand*)command
 {
-   self.callbackId = command.callbackId;
+   //self.callbackId = command.callbackId;
    NSArray *conversations = [Bit6 conversations];
 
     if ([conversations count]){
@@ -57,19 +57,22 @@
             NSLog(@"processing conv- %@", convers.displayName);
             NSMutableDictionary *mutableDictionary = [[NSMutableDictionary alloc] init];
 
+            NSMutableArray *messages = [self bit6ArrayToDictionaryArray:[convers.messages mutableCopy]];
+
             //TODO: Include all needed data
-            [mutableDictionary setObject:convers.displayName forKey:@"displayName"];
+            [mutableDictionary setObject:convers.displayName forKey:@"title"];
+            //[mutableDictionary setObject:convers.address. forKey:@"uri"];
+            [mutableDictionary setObject:messages forKey:@"messages"];
 
             [mutableArray addObject:mutableDictionary];
         }
 
         NSDictionary *data = [NSDictionary dictionaryWithObject:mutableArray forKey:@"conversations"];
 
-        if (self.callbackId) {
-            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
-            [result setKeepCallbackAsBool:YES];
-            [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
-        }
+
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+        [result setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }
 }
 
@@ -131,20 +134,7 @@
 
     if ([messages count]){
 
-        NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:[messages count]];
-
-        for (Bit6Message * message in messages){
-
-            NSMutableDictionary *mutableDictionary = [[NSMutableDictionary alloc] init];
-
-            [mutableDictionary setObject:message.content forKey:@"content"];
-            [mutableDictionary setObject:@(message.incoming) forKey:@"incoming"];
-            [mutableDictionary setObject:[[NSDictionary alloc] initWithObjectsAndKeys:message.other.displayName, @"displayName", nil]  forKey:@"other"];
-            [mutableDictionary setObject:[[NSDictionary alloc] initWithObjectsAndKeys:message.data.lat, @"lat", message.data.lng, @"lng", nil]  forKey:@"data"];
-
-            [mutableArray addObject:mutableDictionary];
-        }
-
+        NSMutableArray *mutableArray = [self bit6ArrayToDictionaryArray:messages];
         NSDictionary *data = [NSDictionary dictionaryWithObject:mutableArray forKey:@"messages"];
 
         if (self.callbackId) {
@@ -177,4 +167,26 @@
 }
 
 
+
+//This is a supporting function which allows to get NSArray of dictionaries from Bit6Messages.
+- (NSArray*) bit6ArrayToDictionaryArray:(NSArray*) messages
+{
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:[messages count]];
+
+    for (Bit6Message * message in messages){
+
+        NSMutableDictionary *mutableDictionary = [[NSMutableDictionary alloc] init];
+
+        [mutableDictionary setObject:message.content forKey:@"content"];
+        [mutableDictionary setObject:@(message.incoming) forKey:@"incoming"];
+        [mutableDictionary setObject:[[NSDictionary alloc] initWithObjectsAndKeys:message.other.displayName, @"displayName", nil]  forKey:@"other"];
+        [mutableDictionary setObject:[[NSDictionary alloc] initWithObjectsAndKeys:message.data.lat, @"lat", message.data.lng, @"lng", nil]  forKey:@"data"];
+
+        [mutableArray addObject:mutableDictionary];
+    }
+
+    return mutableArray;
+}
+
 @end
+

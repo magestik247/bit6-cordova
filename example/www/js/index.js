@@ -17,6 +17,7 @@
  * under the License.
  */
 
+//so far just keeping chatter's name. This may require changing to uri (usr:someUser)
 var currentChatUri = "";
 
 var app = {
@@ -50,26 +51,11 @@ var app = {
             function(response){
                 console.log(response);
                 if (response.connected)
-                 switchToChatScreen();
+                 onLoginDone();
             },
             function(error){
               alert("Error on isConnected api call");
             });
-
-         bit6.conversations(
-            function(data){
-                var listToDisplay = "Convsersatioins: \n ";
-                for (var i = 0; i < data.conversations.length; ++i) {
-                  console.log(data.conversations[i].displayName);
-                  listToDisplay = listToDisplay.concat(data.conversations[i].displayName).concat("\n");
-                  populateChatList(data.conversations);
-                }
-                //alert(listToDisplay);
-            },
-            function(error){
-              alert("Error on getting conv" + error);
-            });
-
     },
     onMessageReceived : function(e){
       $("#incoming").html("");
@@ -87,6 +73,22 @@ var app = {
         }
     }
 };
+
+function onLoginDone() {
+  switchToChatListScreen();
+  bit6.conversations(
+    function(data){
+      var listToDisplay = "Convsersatioins: \n ";
+      for (var i = 0; i < data.conversations.length; ++i) {
+        console.log(data.conversations[i].displayName);
+        listToDisplay = listToDisplay.concat(data.conversations[i].displayName).concat("\n");
+        populateChatList(data.conversations);
+      }
+    },
+    function(error){
+      alert("Error on getting conv" + error);
+    });
+}
 
 function initButtonListeners() {
   $("#signup").click(function(){
@@ -147,7 +149,8 @@ function initButtonListeners() {
         });
 
         $("#sendMessage").click(function(){
-            bit6.sendPushMessage($("#message").val(), "nar2", function(success){
+            console.log("sending message to ", currentChatUri);
+            bit6.sendPushMessage($("#message").val(), currentChatUri, function(success){
               console.log(JSON.stringify(success));
             }, function(error){
               alert(JSON.stringify(error));
@@ -163,33 +166,42 @@ function populateChatList(conversations) {
             currentChatUri = c.uri;
         }
 
-        var d = new Date(c.updated);
-        var stamp = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+        var stamp = '';
         var latestText = 'latestText example';
 
-        // // Find the latest message in the conversation
+        // Find the latest message in the conversation
         if (c.messages && c.messages.length > 0) {
-            console.log("Lookin on messages --- ");
             console.log(c.content);
             var latestMsg = c.messages[c.messages.length-1];
+            var d = new Date(latestMsg.updated);
+            var stamp = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+
             // Show the text from the latest conversation
-            //if (latestMsg.content)
-                latestText = latestMsg.content;
+            if (latestMsg.content)
+              latestText = latestMsg.content;
         }
         chatList.append(
             $('<div />')
                 .append($('<strong>' + c.title + '</strong>'))
                 .append($('<span>' + latestText + '</span>'))
                 .append($('<em>' + stamp + '</em>'))
+                .on('click', {'name': c.title}, function(e) {
+                    onChatSelected(e.data.name);
+                })
         );
     }
 }
 
+function onChatSelected(name) {
+  switchToChatScreen();
+  $("#chatter")[0].innerHTML = name;
+  currentChatUri = name;
+}
+
 function switchToChatScreen() {
-  var loginScreen = $("#loginScreen")[0];
-  loginScreen.style.display = "none";
-  var chatScreen = $("#chatScreen")[0];
-  chatScreen.style.display = "block";
+  $("#loginScreen")[0].style.display = "none";
+  $("#chatScreen")[0].style.display = "block";
+  $("#chatListScreen")[0].style.display = "none";
 }
 
 function switchToChatListScreen() {

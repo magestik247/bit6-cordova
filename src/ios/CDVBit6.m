@@ -46,29 +46,26 @@
 
 - (void)conversations:(CDVInvokedUrlCommand*)command
 {
-   //self.callbackId = command.callbackId;
-   NSArray *conversations = [Bit6 conversations];
 
-    if ([conversations count]){
+   NSArray *bit6Conversations = [Bit6 conversations];
 
-        NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:[conversations count]];
+   if ([bit6Conversations count]){
+        NSMutableArray *conversations = [[NSMutableArray alloc] initWithCapacity:[bit6Conversations count]];
 
-        for (Bit6Conversation * convers in conversations){
-            NSLog(@"processing conv- %@", convers.displayName);
-            NSMutableDictionary *mutableDictionary = [[NSMutableDictionary alloc] init];
+        for (Bit6Conversation * convers in bit6Conversations){
+            NSMutableDictionary *convDictionary = [[NSMutableDictionary alloc] init];
 
-            NSMutableArray *messages = [self bit6ArrayToDictionaryArray:[convers.messages mutableCopy]];
+            NSArray *messages = [self bit6MsgArrayToDictionaryArray:convers.messages];
 
             //TODO: Include all needed data
-            [mutableDictionary setObject:convers.displayName forKey:@"title"];
+            [convDictionary setObject:convers.displayName forKey:@"title"];
             //[mutableDictionary setObject:convers.address. forKey:@"uri"];
-            [mutableDictionary setObject:messages forKey:@"messages"];
+            [convDictionary setObject:messages forKey:@"messages"];
 
-            [mutableArray addObject:mutableDictionary];
+            [conversations addObject:convDictionary];
         }
 
-        NSDictionary *data = [NSDictionary dictionaryWithObject:mutableArray forKey:@"conversations"];
-
+        NSDictionary *data = [NSDictionary dictionaryWithObject:conversations forKey:@"conversations"];
 
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
         [result setKeepCallbackAsBool:YES];
@@ -127,15 +124,16 @@
 }
 
 
+//TODO: This handler actually gets messages, not conversations. The logic should be moved to a better place
 - (void) conversationsUpdatedNotification:(NSNotification*)notification
 {
    //get updated conversations
-   NSArray *messages = [Bit6 messagesWithOffset:0 length:NSIntegerMax asc:NO];
+   NSArray *bit6Messages = [Bit6 messagesWithOffset:0 length:NSIntegerMax asc:NO];
 
-    if ([messages count]){
+    if ([bit6Messages count]){
 
-        NSMutableArray *mutableArray = [self bit6ArrayToDictionaryArray:messages];
-        NSDictionary *data = [NSDictionary dictionaryWithObject:mutableArray forKey:@"messages"];
+        NSArray *messages = [self bit6MsgArrayToDictionaryArray:bit6Messages];
+        NSDictionary *data = [NSDictionary dictionaryWithObject:messages forKey:@"messages"];
 
         if (self.callbackId) {
             CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
@@ -169,7 +167,7 @@
 
 
 //This is a supporting function which allows to get NSArray of dictionaries from Bit6Messages.
-- (NSArray*) bit6ArrayToDictionaryArray:(NSArray*) messages
+- (NSArray*) bit6MsgArrayToDictionaryArray:(NSArray*) messages
 {
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:[messages count]];
 
@@ -179,6 +177,7 @@
 
         [mutableDictionary setObject:message.content forKey:@"content"];
         [mutableDictionary setObject:@(message.incoming) forKey:@"incoming"];
+        [mutableDictionary setObject:(message.updated ? message.updated : [NSNumber numberWithInt:0]) forKey:@"updated"];
         [mutableDictionary setObject:[[NSDictionary alloc] initWithObjectsAndKeys:message.other.displayName, @"displayName", nil]  forKey:@"other"];
         [mutableDictionary setObject:[[NSDictionary alloc] initWithObjectsAndKeys:message.data.lat, @"lat", message.data.lng, @"lng", nil]  forKey:@"data"];
 

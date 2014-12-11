@@ -58,21 +58,33 @@ var app = {
             });
     },
     onMessageReceived : function(e){
-      $("#incoming").html("");
+          populateConversationWindow(e.messages);
+       }
+    };
 
-      for(var index = 0; index < e.messages.length;index++){
-            var div = $("<div/>");
-            var displayName = e.messages[index].other.displayName;
-            if (!e.messages[index].incoming){
-              displayName = "Me";
-            }
-
-            div.append("<h3>" + displayName + "</h3>");
-            div.append("<p>" + e.messages[index].content + "</p>");
-            $("#incoming").append($(div).html());
-        }
+    function updateCurrentChat() {
+      bit6.getConversationByUri(currentChatUri,
+        function(conversation){
+          populateConversationWindow(conversation.messages);
+        },
+        function(error){
+          alert("Error on getConversationByUri api call");
+        });
     }
-};
+
+function populateConversationWindow(messages) {
+  for(var index = 0; index < messages.length;index++){
+    var div = $("<div/>");
+    var displayName = messages[index].other.displayName;
+    if (!messages[index].incoming){
+      displayName = "Me";
+    }
+
+    div.append("<h3>" + displayName + "</h3>");
+    div.append("<p>" + messages[index].content + "</p>");
+    $("#incoming").append($(div).html());
+  }
+}
 
 function onLoginDone() {
   switchToChatListScreen();
@@ -114,7 +126,7 @@ function initButtonListeners() {
         $("#voiceCall").click(function(){
            var opts = { video : false};
            //FIXME: get current username
-           bit6.startCall("nar2", opts, function(success){
+           bit6.startCall(currentChatUri, opts, function(success){
                console.log(JSON.stringify(success));
            }, function(error){
              alert("Error on call" + JSON.stringify(error));
@@ -124,7 +136,7 @@ function initButtonListeners() {
         $("#videoCall").click(function(){
            var opts = { video : true};
            //FIXME: get current username
-           bit6.startCall("nar2", opts, function(success){
+           bit6.startCall(currentChatUri, opts, function(success){
                console.log(JSON.stringify(success));
            }, function(error){
              alert("Error on call" + JSON.stringify(error));
@@ -196,6 +208,7 @@ function onChatSelected(name) {
   switchToChatScreen();
   $("#chatter")[0].innerHTML = name;
   currentChatUri = name;
+  updateCurrentChat();
 }
 
 function switchToChatScreen() {

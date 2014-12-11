@@ -38,6 +38,10 @@ Bit6.prototype.conversations = function(success, error){
   exec(success, error, "Bit6", "conversations", null);
 }
 
+Bit6.prototype.getConversationByUri = function(uri, success, error){
+  exec(success, error, "Bit6", "getConversationByUri", [uri]);
+}
+
 //opts = { video: true/false, ... }
 //For now only video flag is used, but keeping a generic interface similar to JS SDK
 //This can be extended later.

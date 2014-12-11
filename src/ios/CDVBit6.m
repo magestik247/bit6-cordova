@@ -74,6 +74,31 @@
 }
 
 
+- (void)getConversationByUri:(CDVInvokedUrlCommand*)command
+{
+   NSString *uri = [command.arguments objectAtIndex:0];
+   NSArray *bit6Conversations = [Bit6 conversations];
+   if ([bit6Conversations count]){
+        NSMutableArray *conversations = [[NSMutableArray alloc] initWithCapacity:[bit6Conversations count]];
+
+        for (Bit6Conversation * convers in bit6Conversations){
+            if ([convers.address.displayName isEqualToString:uri]) {
+                NSMutableDictionary *convDictionary = [[NSMutableDictionary alloc] init];
+                NSArray *messages = [self bit6MsgArrayToDictionaryArray:convers.messages];
+
+                //TODO: Include all needed data
+                [convDictionary setObject:convers.displayName forKey:@"title"];
+                [convDictionary setObject:messages forKey:@"messages"];
+
+                CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:convDictionary];
+                [result setKeepCallbackAsBool:YES];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+                break;
+            }
+        }
+    }
+}
+
 - (void)startCallToAddress:(CDVInvokedUrlCommand*)command
 {
     NSString *to = [command.arguments objectAtIndex:0];
@@ -166,7 +191,7 @@
 
 
 
-//This is a supporting function which allows to get NSArray of dictionaries from Bit6Messages.
+//This is a supporting function which returns NSArray of dictionaries from Bit6Messages.
 - (NSArray*) bit6MsgArrayToDictionaryArray:(NSArray*) messages
 {
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:[messages count]];

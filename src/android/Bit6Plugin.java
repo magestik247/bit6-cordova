@@ -7,26 +7,34 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+
+import com.bit6.sdk.Bit6;
+
 /**
- * This class echoes a string called from JavaScript.
+ * Bit6 Cordova plugin
  */
 public class Bit6Plugin extends CordovaPlugin {
 
+    static final String REGISTER = "register";
+
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("coolMethod")) {
-            String message = args.getString(0);
-            this.coolMethod(message, callbackContext);
+        if (action.equals(REGISTER)) {
+            register(args.getString(0));
             return true;
         }
         return false;
     }
 
-    private void coolMethod(String message, CallbackContext callbackContext) {
-        if (message != null && message.length() > 0) {
-            callbackContext.success(message);
-        } else {
-            callbackContext.error("Expected one non-empty string argument.");
-        }
+    void register(String gcmSenderId) {
+       Context context= this.cordova.getActivity().getApplicationContext();
+
+       int appResId = cordova.getActivity().getResources().getIdentifier("api_key", "string", cordova.getActivity().getPackageName());
+       String apikey = cordova.getActivity().getString(appResId);
+
+       Bit6.getInstance().init(context, apikey, null, gcmSenderId);
     }
 }

@@ -1,13 +1,22 @@
 var cordova = require('cordova');
 var exec = require('cordova/exec');
- var channel = require('cordova/channel');
+var channel = require('cordova/channel');
+
+
+//TODO: move this into Bit6.
+var callbackMap = {};
 
 function Bit6(){
       var me = this;
+
       channel.onCordovaReady.subscribe(function() {
           me.startListening();
           channel.onCordovaInfoReady.fire();
       });
+}
+
+Bit6.prototype.on = function(notification, callback){
+     callbackMap[notification] = callback;
 }
 
 Bit6.prototype.startListening = function(){
@@ -58,7 +67,7 @@ Bit6.prototype.sendPushMessage = function(message, to, success, error){
 }
 
 Bit6.prototype._notification = function(info){
-    cordova.fireDocumentEvent("messageReceived", info);
+    callbackMap[info.notification]();
 }
 
 Bit6.prototype._error = function(e) {

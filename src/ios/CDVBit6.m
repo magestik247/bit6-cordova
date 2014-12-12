@@ -79,8 +79,6 @@
    NSString *uri = [command.arguments objectAtIndex:0];
    NSArray *bit6Conversations = [Bit6 conversations];
    if ([bit6Conversations count]){
-        NSMutableArray *conversations = [[NSMutableArray alloc] initWithCapacity:[bit6Conversations count]];
-
         for (Bit6Conversation * convers in bit6Conversations){
             if ([convers.address.displayName isEqualToString:uri]) {
                 NSMutableDictionary *convDictionary = [[NSMutableDictionary alloc] init];
@@ -141,6 +139,13 @@
 - (void) messagesUpdatedNotification:(NSNotification*)notification
 {
     NSLog(@"Info: Received messagesUpdatedNotification");
+    NSDictionary *data = [NSDictionary dictionaryWithObject:@"messageReceived" forKey:@"notification"];
+
+        if (self.callbackId) {
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+            [result setKeepCallbackAsBool:YES];
+            [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+        }
 }
 
 - (void) typingDidBeginRtNotification:(NSNotification*)notification
@@ -157,8 +162,9 @@
 
     if ([bit6Messages count]){
 
-        NSArray *messages = [self bit6MsgArrayToDictionaryArray:bit6Messages];
-        NSDictionary *data = [NSDictionary dictionaryWithObject:messages forKey:@"messages"];
+        //NSArray *messages = [self bit6MsgArrayToDictionaryArray:bit6Messages];
+        //NSDictionary *data = [NSDictionary dictionaryWithObject:messages forKey:@"messages"];
+        NSDictionary *data = [NSDictionary dictionaryWithObject:@"messageReceived" forKey:@"notification"];
 
         if (self.callbackId) {
             CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];

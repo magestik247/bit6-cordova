@@ -130,10 +130,9 @@
     self.callbackId = command.callbackId;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationsUpdatedNotification:) name:Bit6ConversationsUpdatedNotification object:nil];
-
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messagesUpdatedNotification:) name:Bit6MessagesUpdatedNotification object:nil];
-
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(typingDidBeginRtNotification:) name:Bit6TypingDidBeginRtNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(typingDidEndRtNotification:) name:Bit6TypingDidEndRtNotification object:nil];
 }
 
 - (void) messagesUpdatedNotification:(NSNotification*)notification
@@ -150,7 +149,26 @@
 
 - (void) typingDidBeginRtNotification:(NSNotification*)notification
 {
-    NSLog(@"Info: Received Typing Notification");
+    NSLog(@"Info: Received Typing did begin begin Notification");
+    NSDictionary *data = [NSDictionary dictionaryWithObject:@"typingStarted" forKey:@"notification"];
+
+    if (self.callbackId) {
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+        [result setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+    }
+}
+
+- (void) typingDidEndRtNotification:(NSNotification*)notification
+{
+    NSLog(@"Info: Received Typing did end Notification");
+    NSDictionary *data = [NSDictionary dictionaryWithObject:@"typingStopped" forKey:@"notification"];
+
+    if (self.callbackId) {
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+        [result setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+    }
 }
 
 

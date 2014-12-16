@@ -58,6 +58,8 @@ var app = {
 
        //adding notification callbacks
        bit6.on('messageReceived', onMessageReceived);
+       bit6.on('typingStarted', onTypingStarted);
+       bit6.on('typingStopped', onTypingStopped);
        },
   };
 
@@ -65,6 +67,13 @@ function onMessageReceived() {
    updateCurrentChat();
 };
 
+function onTypingStarted() {
+  $("#typingLabel")[0].innerHTML = "Typing...";
+}
+
+function onTypingStopped() {
+  $("#typingLabel")[0].innerHTML = "";
+}
 
 function updateCurrentChat() {
   bit6.getConversationByUri(currentChatUri,

@@ -46,19 +46,19 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
     NSLog(@"didReceiveRemoteNotification");
-    [NSNotificationCenter defaultCenter] postNotificationName:Bit6RemoteNotificationReceived object:nil userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:Bit6RemoteNotificationReceived object:nil userInfo:userInfo];
 }
 
 - (void) application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {
     NSLog(@"didRegisterForRemoteNotificationsWithDeviceToken");
-    [NSNotificationCenter defaultCenter] postNotificationName:Bit6DidRegisterForRemoteNotifications object:nil userInfo:@{@"deviceToken":deviceToken}];
+    [[NSNotificationCenter defaultCenter] postNotificationName:Bit6DidRegisterForRemoteNotifications object:nil userInfo:@{@"deviceToken":deviceToken}];
 }
 
 - (void) application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
     NSLog(@"didFailToRegisterForRemoteNotificationsWithError");
-    [NSNotificationCenter defaultCenter] postNotificationName:Bit6DidFailToRegisterForRemoteNotifications object:nil userInfo:@{@"error":error}];
+    [[NSNotificationCenter defaultCenter] postNotificationName:Bit6DidFailToRegisterForRemoteNotifications object:nil userInfo:@{@"error":error}];
 }
 
 - (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings

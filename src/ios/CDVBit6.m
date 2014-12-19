@@ -125,6 +125,15 @@
     }];
 }
 
+- (void)sendTypingNotification:(CDVInvokedUrlCommand*)command
+{
+    NSString *to = [command.arguments objectAtIndex:0];
+    Bit6Address *address = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:to];
+
+    [Bit6 typingBeginToAddress:address];
+}
+
+
 - (void)startListening:(CDVInvokedUrlCommand*)command
 {
     self.callbackId = command.callbackId;

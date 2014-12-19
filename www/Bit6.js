@@ -62,6 +62,10 @@ Bit6.prototype.sendTextMessage = function(message, to, success, error){
   exec(success, error, "Bit6", "sendMessage", [message, to, 2]);
 }
 
+Bit6.prototype.sendTypingNotification = function(to, success, error){
+  exec(success, error, "Bit6", "sendTypingNotification", [to]);
+}
+
 Bit6.prototype.sendPushMessage = function(message, to, success, error){
   exec(success, error, "Bit6", "sendMessage", [message, to, 3]);
 }

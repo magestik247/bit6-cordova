@@ -19,6 +19,7 @@
 
 //so far just keeping chatter's name. This may require changing to uri format used in JS sdk (usr:someUser)
 var currentChatUri = "";
+var lastTypingSent = 0;
 
 var app = {
     // Application Constructor
@@ -182,6 +183,15 @@ function initButtonListeners() {
       alert(JSON.stringify(error));
     });
   });
+
+       // Key down event in compose input field
+    $('#message').keydown(function() {
+        var now = Date.now();
+        if (now - lastTypingSent > 7000) {
+            lastTypingSent = now;
+            bit6.sendTypingNotification(currentChatUri);
+        }
+    });
  }
 
 function populateChatList(conversations) {

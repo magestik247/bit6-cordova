@@ -43,11 +43,11 @@
     return [self.viewController getCommandInstance:className];
 }
 
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
-{
-    NSLog(@"didReceiveRemoteNotification");
-    [[NSNotificationCenter defaultCenter] postNotificationName:Bit6RemoteNotificationReceived object:nil userInfo:userInfo];
-}
+// - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+// {
+//     NSLog(@"didReceiveRemoteNotification");
+//     [[NSNotificationCenter defaultCenter] postNotificationName:Bit6RemoteNotificationReceived object:nil userInfo:userInfo];
+// }
 
 - (void) application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {

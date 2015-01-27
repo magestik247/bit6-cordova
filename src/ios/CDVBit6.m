@@ -13,8 +13,8 @@
     Bit6Address *identity = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:username];
 
     [Bit6Session signUpWithUserIdentity:identity password:password completionHandler:^(NSDictionary *response, NSError *error) {
-         [self processCommandWithResult:command response:response error:error];
-    }];
+       [self processCommandWithResult:command response:response error:error];
+   }];
 }
 
 - (void)login:(CDVInvokedUrlCommand *)command
@@ -47,63 +47,80 @@
 - (void)conversations:(CDVInvokedUrlCommand*)command
 {
 
-   NSArray *bit6Conversations = [Bit6 conversations];
+ NSArray *bit6Conversations = [Bit6 conversations];
 
-   if ([bit6Conversations count]){
-        NSMutableArray *conversations = [[NSMutableArray alloc] initWithCapacity:[bit6Conversations count]];
+ if ([bit6Conversations count]){
+    NSMutableArray *conversations = [[NSMutableArray alloc] initWithCapacity:[bit6Conversations count]];
 
-        for (Bit6Conversation * convers in bit6Conversations){
-            NSMutableDictionary *convDictionary = [[NSMutableDictionary alloc] init];
+    for (Bit6Conversation * convers in bit6Conversations){
+        NSMutableDictionary *convDictionary = [[NSMutableDictionary alloc] init];
 
-            NSArray *messages = [self bit6MsgArrayToDictionaryArray:convers.messages];
+        NSArray *messages = [self bit6MsgArrayToDictionaryArray:convers.messages];
 
             //TODO: Include all needed data
-            [convDictionary setObject:convers.displayName forKey:@"title"];
+        [convDictionary setObject:convers.displayName forKey:@"title"];
             //[mutableDictionary setObject:convers.address. forKey:@"uri"];
-            [convDictionary setObject:messages forKey:@"messages"];
+        [convDictionary setObject:messages forKey:@"messages"];
 
-            [conversations addObject:convDictionary];
-        }
-
-        NSDictionary *data = [NSDictionary dictionaryWithObject:conversations forKey:@"conversations"];
-
-        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
-        [result setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        [conversations addObject:convDictionary];
     }
+
+    NSDictionary *data = [NSDictionary dictionaryWithObject:conversations forKey:@"conversations"];
+
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+    [result setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
 }
 
 
 - (void)getConversationByUri:(CDVInvokedUrlCommand*)command
 {
-   NSString *uri = [command.arguments objectAtIndex:0];
-   NSArray *bit6Conversations = [Bit6 conversations];
-   if ([bit6Conversations count]){
-        for (Bit6Conversation * convers in bit6Conversations){
-            if ([convers.address.displayName isEqualToString:uri]) {
-                NSMutableDictionary *convDictionary = [[NSMutableDictionary alloc] init];
-                NSArray *messages = [self bit6MsgArrayToDictionaryArray:convers.messages];
+ NSString *uri = [command.arguments objectAtIndex:0];
+ NSArray *bit6Conversations = [Bit6 conversations];
+ if ([bit6Conversations count]){
+    for (Bit6Conversation * convers in bit6Conversations){
+        if ([convers.address.displayName isEqualToString:uri]) {
+            NSMutableDictionary *convDictionary = [[NSMutableDictionary alloc] init];
+            NSArray *messages = [self bit6MsgArrayToDictionaryArray:convers.messages];
 
                 //TODO: Include all needed data
-                [convDictionary setObject:convers.displayName forKey:@"title"];
-                [convDictionary setObject:messages forKey:@"messages"];
+            [convDictionary setObject:convers.displayName forKey:@"title"];
+            [convDictionary setObject:messages forKey:@"messages"];
 
-                CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:convDictionary];
-                [result setKeepCallbackAsBool:YES];
-                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-                break;
-            }
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:convDictionary];
+            [result setKeepCallbackAsBool:YES];
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            break;
         }
     }
+}
 }
 
 - (void)startCallToAddress:(CDVInvokedUrlCommand*)command
 {
+
     NSString *to = [command.arguments objectAtIndex:0];
     //TOOD: Should support all kinds, not only username.
     Bit6Address *address = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:to];
     BOOL hasVideo = [[command.arguments objectAtIndex:1] boolValue];
-    [Bit6 startCallToAddress:address hasVideo:hasVideo];
+    Bit6CallController *callController = [Bit6 startCallToAddress:address hasVideo:NO];
+    //UIViewController *vc = nil; //create a custom viewcontroller or nil to use the default one
+
+    if (callController){
+        [callController connectToViewController:nil completion:^(UIViewController *viewController, NSError *error) {
+            if (error) {
+                [[[UIAlertView alloc] initWithTitle:error.localizedDescription message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+            }
+            else {
+                //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(callStateChangedNotification:) name:Bit6CallStateChangedNotification object:callController];
+                [[[[UIApplication sharedApplication] windows][0] rootViewController] presentViewController:viewController animated:YES completion:nil];
+            }
+        }];
+    }
+    else {
+        NSLog(@"Call failed");
+    }
 }
 
 - (void)sendMessage:(CDVInvokedUrlCommand*)command
@@ -149,11 +166,11 @@
     NSLog(@"Info: Received messagesUpdatedNotification");
     NSDictionary *data = [NSDictionary dictionaryWithObject:@"messageReceived" forKey:@"notification"];
 
-        if (self.callbackId) {
-            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
-            [result setKeepCallbackAsBool:YES];
-            [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
-        }
+    if (self.callbackId) {
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+        [result setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+    }
 }
 
 - (void) typingDidBeginRtNotification:(NSNotification*)notification
@@ -185,20 +202,20 @@
 - (void) conversationsUpdatedNotification:(NSNotification*)notification
 {
    //get updated conversations
-   NSArray *bit6Messages = [Bit6 messagesWithOffset:0 length:NSIntegerMax asc:NO];
+ NSArray *bit6Messages = [Bit6 messagesWithOffset:0 length:NSIntegerMax asc:NO];
 
-    if ([bit6Messages count]){
+ if ([bit6Messages count]){
 
         //NSArray *messages = [self bit6MsgArrayToDictionaryArray:bit6Messages];
         //NSDictionary *data = [NSDictionary dictionaryWithObject:messages forKey:@"messages"];
-        NSDictionary *data = [NSDictionary dictionaryWithObject:@"messageReceived" forKey:@"notification"];
+    NSDictionary *data = [NSDictionary dictionaryWithObject:@"messageReceived" forKey:@"notification"];
 
-        if (self.callbackId) {
-            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
-            [result setKeepCallbackAsBool:YES];
-            [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
-        }
+    if (self.callbackId) {
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+        [result setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
     }
+}
 }
 
 - (void)stopListen:(CDVInvokedUrlCommand*)command

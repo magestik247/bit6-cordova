@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <plugin id="com.bit6.sdk"
-version="1.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0"
-xmlns:android="http://schemas.android.com/apk/res/android">
+  version="1.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
 
   <name>Bit6</name>
 
@@ -11,11 +11,11 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     <engine name="cordova" version=">=3.0.0"/>
   </engines>
 
-  <js-module name="Bit6" src="www/Bit6.js">
-    <clobbers target="bit6"/>
-  </js-module>
-
   <platform name="ios">
+
+    <js-module name="Bit6" src="www/ios/Bit6.js">
+    <clobbers target="bit6"/>
+    </js-module>
 
     <config-file parent="/*" target="config.xml">
       <feature name="Bit6">
@@ -29,9 +29,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     <framework src="libsqlite3.dylib"/>
     <framework src="GLKit.framework"/>
     <framework src="lib/ios/Bit6SDK.framework" custom="true"/>
-    
+
     <resource-file src="lib/ios/Bit6SDK.framework/Resources/Bit6Resources.bundle" />
-    
+
     <header-file src="lib/ios/Bit6SDK.framework/Headers/Bit6SDK.h"/>
     <header-file src="src/ios/AppDelegate+bit6.h" />
     <source-file src="src/ios/AppDelegate+bit6.m" compiler-flags="-ObjC" />
@@ -39,21 +39,88 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     <source-file src="src/ios/CDVBit6.m" linker-flags="-stdlib=libc++" />
 
     <config-file target="*-Info.plist" parent="API_KEY">
-        <string>$API_KEY</string>
+      <string>$API_KEY</string>
     </config-file>
 
   </platform>
 
   <platform name="android">
-    <config-file parent="/*" target="res/xml/config.xml">
-      <feature name="Bit6"><param name="android-package" value="com.bit6.sdk.Bit6Plugin" />
-      </feature>
-    </config-file>
+   <framework src="lib/android/bit6-sdk" custom="true" />
 
-    <config-file parent="/*" target="AndroidManifest.xml">
-    </config-file>
+   <hook type="after_plugin_install" src="scripts/afterinstall.js" />
 
-    <source-file src="src/android/Bit6Plugin.java" target-dir="src/com/telerik/bit6/Bit6Plugin"/>
+
+   <js-module name="Bit6" src="www/android/Bit6.js">
+    <clobbers target="bit6"/>
+  </js-module>
+
+  <source-file src="src/android/res/values/bit6.xml" target-dir="res/values" />
+
+  <config-file target="res/values/bit6.xml" parent="/*">
+    <string name="app_key">$API_KEY</string>
+  </config-file>
+
+  <config-file parent="/*" target="res/xml/config.xml">
+    <feature name="Bit6"><param name="android-package" value="com.bit6.sdk.Bit6Plugin" />
+  </feature>
+</config-file>
+
+<config-file target="AndroidManifest.xml" parent="/manifest">
+  <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+  <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+  <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+  <uses-permission android:name="android.permission.INTERNET" />
+
+  <permission
+    android:name="com.bit6.permission.C2D_MESSAGE"
+    android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.bit6.permission.C2D_MESSAGE" />
+
+    <!-- This app has permission to register and receive data message. -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+
+    <application android:name="com.bit6.sdk.Bit6App"/>
+
+  </config-file>
+
+  <config-file target="AndroidManifest.xml" parent="/manifest/application">
+    <activity android:name="com.bit6.sdk.ui.InCallActivity"
+     android:label="@string/app_name"
+     android:configChanges="orientation|screenSize"
+     android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+   </activity>
+   <provider
+    android:name="com.bit6.sdk.Bit6ContentProvider"
+    android:authorities="com.bit6.ChatDemo"
+    android:exported="false" />
+    <meta-data android:name="com.google.android.gms.version" android:value="6171000" />
+
+    <receiver
+      android:name="com.bit6.sdk.gcm.GcmBroadcastReceiver"
+      android:permission="com.google.android.c2dm.permission.SEND" >
+      <intent-filter>
+
+        <!-- Receives the actual messages. -->
+        <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+        <category android:name="com.bit6" />
+      </intent-filter>
+    </receiver>
+    <service android:name="com.bit6.sdk.gcm.GcmIntentService" />
+
+  </config-file>
+
+    <!--  <source-file src="lib/android/armeabi-v7a/libjingle_peerconnection_so.so" target-dir="libs/armeabi-v7a"/>
+
+      <source-file src="lib/android/android-support-v4.jar" target-dir="libs"/>
+      <source-file src="lib/android/bit6-sdk.jar" target-dir="libs"/>
+      <source-file src="lib/android/google-play-services.jar" target-dir="libs"/>
+      <source-file src="lib/android/libjingle_peerconnection.jar" target-dir="libs"/>
+    -->
+
+    <source-file src="src/android/Bit6Plugin.java" target-dir="src/com/bit6/sdk"/>
+    <source-file src="src/android/Bit6App.java" target-dir="src/com/bit6/sdk"/>
 
   </platform>
 

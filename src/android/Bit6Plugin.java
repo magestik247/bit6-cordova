@@ -88,7 +88,6 @@ public class Bit6Plugin extends CordovaPlugin {
 
   Address to = Address.parse(other);
 
-  //Address to = Address.parse("usr:john");
   RtcDialog dialog = Bit6.getInstance().startCall(to, isVideo);
   // Launch the default InCall activity
   Context context= this.cordova.getActivity().getApplicationContext();
@@ -109,11 +108,11 @@ void getConversation(String other, final CallbackContext callbackContext){
 
      item.put("content", content);
      item.put("incoming", Message.isIncoming(flags));
-     item.put("other", other.substring(other.indexOf(':') + 1)); //get name
      messages.put(item);
    }
    JSONObject data = new JSONObject();
    data.put("messages", messages);
+   data.put("title", other.substring(other.indexOf(':') + 1));
    callbackContext.success(data);
  }
  catch (Exception e) {

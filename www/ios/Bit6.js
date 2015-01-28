@@ -43,7 +43,30 @@ Bit6.prototype.isConnected = function(success, error){
   exec(success, error, "Bit6", "isConnected", null);
 }
 
+//Here is an additional level of logic to bring the data to the expected structure.
 Bit6.prototype.conversations = function(success, error){
+ conversationsFromNative(
+   function(data) {
+    for(var i=0; i < data.conversations.length; i++) {
+       var c = data.conversations[i];
+       if (c.messages && c.messages.length > 0) {
+         var latestMsg = c.messages[c.messages.length-1];
+         if (latestMsg.content)
+           c.content = latestMsg.content;
+
+        var d = new Date(latestMsg.updated);
+        c.stamp = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+        data.conversations[i] = c;
+      }
+    }
+    success(data);
+  },
+  function (err) {
+    error(error);
+  })
+}
+
+function conversationsFromNative (success, error){
   exec(success, error, "Bit6", "conversations", null);
 }
 

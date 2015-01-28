@@ -79,19 +79,20 @@ function onTypingStopped() {
 function updateCurrentChat() {
   bit6.getConversationByUri(currentChatUri,
     function(conversation){
-      populateConversationWindow(conversation.messages);
+      populateConversationWindow(conversation);
     },
     function(error){
       alert("Error on getConversationByUri api call");
     });
 }
 
-function populateConversationWindow(messages) {
+function populateConversationWindow(conversation) {
+  var messages = conversation.messages;
   $("#incoming").html("");
 
   for(var index = 0; index < messages.length;index++){
     var div = $("<div/>");
-    var displayName = messages[index].other.displayName;
+    var displayName = conversation.title;
     if (!messages[index].incoming){
       displayName = "Me";
     }
@@ -195,37 +196,26 @@ function initButtonListeners() {
  }
 
 function populateChatList(conversations) {
+
 var chatList = $('#chatListScreen').html('');
 for(var i=0; i < conversations.length; i++) {
   var c = conversations[i];
   if (!currentChatUri) {
     currentChatUri = c.uri;
   }
+  var latestText = c.content;
+  var stamp = c.stamp;
 
-  var stamp = '';
-  var latestText = 'latestText example';
-
-  // Find the latest message in the conversation
-  if (c.messages && c.messages.length > 0) {
-    console.log(c.content);
-    var latestMsg = c.messages[c.messages.length-1];
-    var d = new Date(latestMsg.updated);
-    var stamp = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
-
-      // Show the text from the latest conversation
-      if (latestMsg.content)
-        latestText = latestMsg.content;
-    }
-    chatList.append(
-      $('<div />')
-      .append($('<strong>' + c.title + '</strong>'))
-      .append($('<span>' + latestText + '</span>'))
-      .append($('<em>' + stamp + '</em>'))
-      .on('click', {'name': c.title}, function(e) {
-        onChatSelected(e.data.name);
-      })
-      );
-  }
+  chatList.append(
+    $('<div />')
+    .append($('<strong>' + c.title + '</strong>'))
+    .append($('<span>' + latestText + '</span>'))
+    .append($('<em>' + stamp + '</em>'))
+    .on('click', {'name': c.title}, function(e) {
+      onChatSelected(e.data.name);
+    })
+    );
+}
 }
 
 function onChatSelected(name) {

@@ -1,8 +1,16 @@
 var cordova = require('cordova');
 var exec = require('cordova/exec');
 
+//TODO: move this into Bit6.
+var callbackMap = {};
+
 function Bit6(){
     this.init();
+}
+
+Bit6.prototype.on = function(notification, callback){
+     this.startListening();
+     callbackMap[notification] = callback;
 }
 
 Bit6.prototype.register = function(gcmSenderId){
@@ -59,7 +67,7 @@ Bit6.prototype.sendPushMessage = function(message, to, success, error){
 }
 
 Bit6.prototype._notification = function(info){
-    cordova.fireDocumentEvent("messageReceived", info);
+    callbackMap[info.notification]();
 }
 
 Bit6.prototype._error = function(e) {

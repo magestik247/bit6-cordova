@@ -2,6 +2,7 @@ package com.bit6.sdk;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.PluginResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +18,7 @@ import com.bit6.sdk.ResultCallback;
 import com.bit6.sdk.Message;
 import com.bit6.sdk.Message.Messages;
 import com.bit6.sdk.RtcDialog;
+import com.bit6.sdk.MessageStatusListener;
 
 import android.database.Cursor;
 
@@ -28,11 +30,12 @@ public class Bit6Plugin extends CordovaPlugin {
 
   static final String INIT = "init";
   static final String LOGIN = "login";
-  static final String CONVERSATIONS = "conversations";
-  static final String CONVERSATION = "getConversation";
+  static final String GET_CONVERSATIONS = "conversations";
+  static final String GET_CONVERSATION = "getConversation";
   static final String IS_CONNECTED = "isConnected";
   static final String START_CALL = "startCallToAddress";
-
+  static final String SEND_MESSAGE = "sendMessage";
+  static final String START_LISTENING = "startListening";
 
 
   @Override
@@ -47,11 +50,11 @@ public class Bit6Plugin extends CordovaPlugin {
      login(args.getString(0), args.getString(1), callbackContext);
      return true;
    }
-   if (action.equals(CONVERSATIONS)) {
+   if (action.equals(GET_CONVERSATIONS)) {
      getConversations(callbackContext);
      return true;
    }
-   if (action.equals(CONVERSATION)) {
+   if (action.equals(GET_CONVERSATION)) {
      getConversation(args.getString(0), callbackContext);
      return true;
    }
@@ -59,6 +62,15 @@ public class Bit6Plugin extends CordovaPlugin {
      startCall(args.getString(0), args.getBoolean(1), callbackContext);
      return true;
    }
+   if (action.equals(SEND_MESSAGE)) {
+     sendMessage(args.getString(0), args.getString(1), callbackContext);
+     return true;
+   }
+   if (action.equals(START_LISTENING)) {
+     startListening(callbackContext);
+     return true;
+   }
+
    if (action.equals(IS_CONNECTED)) {
      isConnected(callbackContext);
      return true;
@@ -66,6 +78,8 @@ public class Bit6Plugin extends CordovaPlugin {
 
    return false;
  }
+
+ CallbackContext mNotificationCallback;
 
  void login(String username, String pass, final CallbackContext callbackContext) {
 
@@ -92,6 +106,22 @@ public class Bit6Plugin extends CordovaPlugin {
   // Launch the default InCall activity
   Context context= this.cordova.getActivity().getApplicationContext();
   dialog.launchInCallActivity(context);
+}
+
+void sendMessage(String message, String other, final CallbackContext callbackContext) {
+  Address to = Address.parse(other);
+
+  Message m =  Message.newMessage(to).text(message);
+  // Bit6.getInstance().sendMessage(m, new MessageStatusListener() {
+  //   @Override
+  //   public void onMessageStatusChanged(Message msg, int state) {
+  //   if (state == Message.STATUS_SENDING) {
+  //     callbackContext.success();
+  //   } else if (state == Message.STATUS_FAILED) {
+  //      callbackContext.error("Error on message sending");
+  //   }
+  // }
+  // });
 }
 
 void getConversation(String other, final CallbackContext callbackContext){
@@ -177,13 +207,37 @@ void conversations(final CallbackContext callbackContext){
 void isConnected(final CallbackContext callbackContext) {
   try {
     JSONObject response = new JSONObject();
-    response.put("connected", Bit6.getInstance().isUserLoggedIn());
+    response.put("connected", Bit6.getInstance().isAuthenticated());
     callbackContext.success(response);
   }
   catch (JSONException e) {
     callbackContext.error("Error: " + e.getMessage());
   }
 }
+
+void startListening(final CallbackContext callbackContext) {
+  if (mNotificationCallback == null)
+  mNotificationCallback = callbackContext;
+}
+
+void notify(final String notificationName) {
+ if (mNotificationCallback == null)
+   return; //TODO: Handle me
+
+ JSONObject parameter = new JSONObject();
+ try {
+   parameter.put("notification", notificationName);
+
+   PluginResult result = new PluginResult(PluginResult.Status.OK, parameter);
+   result.setKeepCallback(true);
+   mNotificationCallback.sendPluginResult(result);
+ }
+ catch (JSONException e) {
+   //TODO: for this case this is not the best way to report the errors.
+   mNotificationCallback.error("Error: " + e.getMessage());
+ }
+}
+
 
 void init() {
  Context context= this.cordova.getActivity().getApplicationContext();

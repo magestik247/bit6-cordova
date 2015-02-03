@@ -11,6 +11,10 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.BroadcastReceiver;
+import android.widget.CursorAdapter;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.bit6.sdk.Address;
 import com.bit6.sdk.Bit6;
@@ -36,6 +40,26 @@ public class Bit6Plugin extends CordovaPlugin {
   static final String START_CALL = "startCallToAddress";
   static final String SEND_MESSAGE = "sendMessage";
   static final String START_LISTENING = "startListening";
+
+
+  MessageCursorAdapter mConvCursorAdapter;
+  MessageCursorAdapter mMessageCursorAdapter;
+
+
+  class MessageCursorAdapter extends CursorAdapter {
+     MessageCursorAdapter (Context context, Cursor c, boolean autoRequery) {
+      super(context, c, autoRequery);
+    }
+
+    @Override
+    protected void onContentChanged() {
+        sendNotification("messageReceived");
+    }
+
+    @Override
+    public void  bindView(View v, Context cntx, Cursor c) {}
+    public View newView(Context cntx, Cursor c, ViewGroup vg) { return null; }
+  }
 
 
   @Override
@@ -119,6 +143,8 @@ void sendMessage(String message, String other, final CallbackContext callbackCon
        callbackContext.error("Error on message sending");
      }
      else {
+      //Fix: There is redundancy in callbacks for this case
+      // CursorAdapter notifies too.
       callbackContext.success(state);
     }
   }
@@ -133,6 +159,11 @@ void getConversation(String other, final CallbackContext callbackContext){
   Cursor cursor;
 
   cursor = Bit6.getInstance().getConversation(address);
+
+  if(mMessageCursorAdapter == null) {
+      mMessageCursorAdapter = new MessageCursorAdapter(this.cordova.getActivity().getApplicationContext(), cursor, false);
+  }
+
   try {
    while (cursor.moveToNext()) {
      JSONObject item = new JSONObject();
@@ -157,6 +188,7 @@ void getConversations(final CallbackContext callbackContext){
   JSONArray conversations = new JSONArray();
   Cursor cursor;
   cursor = Bit6.getInstance().getConversations();
+
   try {
    while (cursor.moveToNext()) {
      JSONObject item = new JSONObject();
@@ -223,7 +255,7 @@ void startListening(final CallbackContext callbackContext) {
   mNotificationCallback = callbackContext;
 }
 
-void notify(final String notificationName) {
+void sendNotification(final String notificationName) {
  if (mNotificationCallback == null)
    return; //TODO: Handle me
 

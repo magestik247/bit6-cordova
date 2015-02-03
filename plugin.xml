@@ -47,7 +47,7 @@
   <platform name="android">
    <framework src="lib/android/bit6-sdk" custom="true" />
 
-   <hook type="after_plugin_install" src="scripts/afterinstall.js" />
+   <!-- hook type="after_plugin_install" src="scripts/afterinstall.js" /> -->
 
 
    <js-module name="Bit6" src="www/android/Bit6.js">
@@ -70,6 +70,7 @@
   <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
   <uses-permission android:name="android.permission.USE_CREDENTIALS" />
   <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
 
   <permission
     android:name="com.bit6.permission.C2D_MESSAGE"
@@ -107,6 +108,13 @@
         <category android:name="com.bit6" />
       </intent-filter>
     </receiver>
+
+    <receiver android:name=".IncomingMessageReceiver" android:enabled="true">
+    <intent-filter>
+        <action android:name="com.bit6.ChatDemo.intent.INCOMING_MESSAGE"></action>
+    </intent-filter>
+    </receiver>
+
     <service android:name="com.bit6.sdk.gcm.GcmIntentService" />
 
   </config-file>
@@ -120,6 +128,7 @@
     -->
 
     <source-file src="src/android/Bit6Plugin.java" target-dir="src/com/bit6/sdk"/>
+    <source-file src="src/android/IncomingMessageReceiver.java" target-dir="src/com/bit6/sdk"/>
     <source-file src="src/android/Bit6App.java" target-dir="src/com/bit6/sdk"/>
 
   </platform>

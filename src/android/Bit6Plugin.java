@@ -110,18 +110,21 @@ public class Bit6Plugin extends CordovaPlugin {
 
 void sendMessage(String message, String other, final CallbackContext callbackContext) {
   Address to = Address.parse(other);
-
   Message m =  Message.newMessage(to).text(message);
-  // Bit6.getInstance().sendMessage(m, new MessageStatusListener() {
-  //   @Override
-  //   public void onMessageStatusChanged(Message msg, int state) {
-  //   if (state == Message.STATUS_SENDING) {
-  //     callbackContext.success();
-  //   } else if (state == Message.STATUS_FAILED) {
-  //      callbackContext.error("Error on message sending");
-  //   }
-  // }
-  // });
+
+  Bit6.getInstance().sendMessage(m, new MessageStatusListener() {
+    @Override
+    public void onMessageStatusChanged(Message msg, int state) {
+      if (state == Message.STATUS_FAILED) {
+       callbackContext.error("Error on message sending");
+     }
+     else {
+      callbackContext.success(state);
+    }
+  }
+  @Override
+  public void onResult(boolean b,  String s) { }
+});
 }
 
 void getConversation(String other, final CallbackContext callbackContext){

@@ -47,7 +47,7 @@
   <platform name="android">
    <framework src="lib/android/bit6-sdk" custom="true" />
 
-   <!-- hook type="after_plugin_install" src="scripts/afterinstall.js" /> -->
+   <hook type="after_plugin_install" src="scripts/afterinstall.js" />
 
 
    <js-module name="Bit6" src="www/android/Bit6.js">
@@ -55,6 +55,9 @@
   </js-module>
 
   <source-file src="src/android/res/values/bit6.xml" target-dir="res/values" />
+  <source-file src="src/android/res/values/strings_bit6.xml" target-dir="res/values" />
+  <source-file src="src/android/res/layout/activity_incoming_call.xml" target-dir="res/layout" />
+
 
   <config-file target="res/values/bit6.xml" parent="/*">
     <string name="app_key">$API_KEY</string>
@@ -71,6 +74,7 @@
   <uses-permission android:name="android.permission.USE_CREDENTIALS" />
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />
+   <uses-permission android:name="android.permission.VIBRATE" />
 
   <permission
     android:name="com.bit6.permission.C2D_MESSAGE"
@@ -92,6 +96,12 @@
      android:configChanges="orientation|screenSize"
      android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
    </activity>
+
+   <activity android:name="com.bit6.ChatDemo.IncomingCallActivity"
+    android:launchMode="singleTop" >
+   </activity>
+
+
    <provider
     android:name="com.bit6.sdk.Bit6ContentProvider"
     android:authorities="com.bit6.ChatDemo"
@@ -109,11 +119,19 @@
       </intent-filter>
     </receiver>
 
+<!--
     <receiver android:name=".IncomingMessageReceiver" android:enabled="true">
     <intent-filter>
-        <action android:name="com.bit6.ChatDemo.intent.INCOMING_MESSAGE"></action>
+        <action android:name="com.bit6.sdk.intent.INCOMING_MESSAGE"></action>
     </intent-filter>
     </receiver>
+
+   <receiver android:name=".IncomingCallReceiver" android:enabled="true">
+      <intent-filter>
+          <action android:name="com.bit6.ChatDemo.INCOMING_CALL"></action>
+      </intent-filter>
+  </receiver>
+-->
 
     <service android:name="com.bit6.sdk.gcm.GcmIntentService" />
 
@@ -129,6 +147,7 @@
 
     <source-file src="src/android/Bit6Plugin.java" target-dir="src/com/bit6/sdk"/>
     <source-file src="src/android/IncomingMessageReceiver.java" target-dir="src/com/bit6/sdk"/>
+    <source-file src="src/android/IncomingCallActivity.java" target-dir="src/com/bit6/sdk"/>
     <source-file src="src/android/Bit6App.java" target-dir="src/com/bit6/sdk"/>
 
   </platform>

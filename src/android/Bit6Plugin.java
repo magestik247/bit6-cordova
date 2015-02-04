@@ -12,9 +12,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.widget.CursorAdapter;
 import android.view.View;
 import android.view.ViewGroup;
+import android.database.Cursor;
+
 
 import com.bit6.sdk.Address;
 import com.bit6.sdk.Bit6;
@@ -24,7 +27,7 @@ import com.bit6.sdk.Message.Messages;
 import com.bit6.sdk.RtcDialog;
 import com.bit6.sdk.MessageStatusListener;
 
-import android.database.Cursor;
+import com.bit6.ChatDemo.IncomingCallActivity;
 
 
 /**
@@ -61,6 +64,18 @@ public class Bit6Plugin extends CordovaPlugin {
     public View newView(Context cntx, Cursor c, ViewGroup vg) { return null; }
   }
 
+  class IncomingCallReceiver extends BroadcastReceiver{
+
+  @Override
+  public void onReceive(Context context, Intent intent) {
+     Intent i = new Intent(context, IncomingCallActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        // Send Call information to the IncomingCallActivity
+        i.putExtra(Bit6.INTENT_EXTRA_DIALOG,
+                   intent.getParcelableExtra(Bit6.INTENT_EXTRA_DIALOG));
+        context.startActivity(i);
+  }
+}
 
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -281,5 +296,8 @@ void init() {
  String apikey = cordova.getActivity().getString(appResId);
 
  Bit6.getInstance().init(context, apikey);
+
+ IntentFilter i = new IntentFilter("com.bit6.ChatDemo.intent.INCOMING_CALL");
+ this.cordova.getActivity().registerReceiver(new IncomingCallReceiver() , i);
 }
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="incoming_voice_call">Incoming Voice Call</string>
+    <string name="incoming_video_call">Incoming Video Call</string>
+    <string name="user_is_calling">%1$s is calling</string>
+    <string name="answer">Answer</string>
+    <string name="reject">Reject</string>
+</resources>

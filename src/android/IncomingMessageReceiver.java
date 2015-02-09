@@ -1,4 +1,4 @@
-package com.bit6.sdk;
+package com.bit6.ChatDemo;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;

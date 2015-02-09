@@ -23,8 +23,6 @@ var lastTypingSent = 0;
 
 var app = {
     // Application Constructor
-
-
     //cordova plugins add ~/Source/Telerik/Plugins/Bit6/Plugin/ --variable API_KEY=308x-3bnqo
 
     initialize: function() {
@@ -65,7 +63,10 @@ var app = {
   };
 
 function onMessageReceived() {
-   updateCurrentChat();
+  //alert("Got notification");
+   if (currentChatUri)
+    updateCurrentChat();
+   updateConversations();
 };
 
 function onTypingStarted() {
@@ -104,6 +105,10 @@ function populateConversationWindow(conversation) {
 
 function onLoginDone() {
   switchToChatListScreen();
+   updateConversations();
+}
+
+function updateConversations() {
   bit6.conversations(
     function(data){
       var listToDisplay = "Convsersatioins: \n ";
@@ -129,7 +134,8 @@ function initButtonListeners() {
   });
 
   $("#login").click(function(){
-   bit6.logout();
+   //bit6.logout();
+   alert("mycheck: login clicked");
 
    bit6.login($("#username").val(), $("#password").val(), function(success){
      console.log(JSON.stringify(success));
@@ -178,8 +184,10 @@ function initButtonListeners() {
 
    $("#sendMessage").click(function(){
     console.log("sending message to ", currentChatUri);
-    bit6.sendPushMessage($("#message").val(), currentChatUri, function(success){
-      console.log(JSON.stringify(success));
+    bit6.sendTextMessage($("#message").val(), currentChatUri, function(success){
+      //console.log(JSON.stringify(success));
+      alert(success);
+      onMessageReceived();
     }, function(error){
       alert(JSON.stringify(error));
     });

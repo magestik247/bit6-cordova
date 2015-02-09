@@ -1,4 +1,4 @@
-package com.bit6.sdk;
+package com.bit6.ChatDemo;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -17,6 +17,8 @@ import android.widget.CursorAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 import android.database.Cursor;
+import android.util.Log;
+import android.os.Bundle;
 
 
 import com.bit6.sdk.Address;
@@ -47,6 +49,7 @@ public class Bit6Plugin extends CordovaPlugin {
 
   MessageCursorAdapter mConvCursorAdapter;
   MessageCursorAdapter mMessageCursorAdapter;
+  CallbackContext mNotificationCallback;
 
 
   class MessageCursorAdapter extends CursorAdapter {
@@ -69,11 +72,9 @@ public class Bit6Plugin extends CordovaPlugin {
   @Override
   public void onReceive(Context context, Intent intent) {
      Intent i = new Intent(context, IncomingCallActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        // Send Call information to the IncomingCallActivity
-        i.putExtra(Bit6.INTENT_EXTRA_DIALOG,
-                   intent.getParcelableExtra(Bit6.INTENT_EXTRA_DIALOG));
-        context.startActivity(i);
+     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+     i.putExtra(Bit6.INTENT_EXTRA_DIALOG, intent.getBundleExtra(Bit6.INTENT_EXTRA_DIALOG));
+     context.startActivity(i);
   }
 }
 
@@ -118,7 +119,18 @@ public class Bit6Plugin extends CordovaPlugin {
    return false;
  }
 
- CallbackContext mNotificationCallback;
+   @Override
+   public void onPause(boolean multitasking) {
+       //TODO: This needs to be fixed (requires some changes in sdk).
+       //Commented out to make IncomingCallActivity/InCallScreen work, otherwise the connection is being lost
+       //Bit6.getInstance().onBackground();
+   }
+   @Override
+   public void onResume(boolean multitasking) {
+       Bit6.getInstance().onForeground();
+   }
+
+
 
  void login(String username, String pass, final CallbackContext callbackContext) {
 
@@ -137,13 +149,13 @@ public class Bit6Plugin extends CordovaPlugin {
   });
 }
 
- void startCall(String other, Boolean isVideo, final CallbackContext callbackContext) {
+void startCall(String other, final Boolean isVideo, final CallbackContext callbackContext) {
 
+  Bit6.getInstance().onForeground();
   Address to = Address.parse(other);
-
-  RtcDialog dialog = Bit6.getInstance().startCall(to, isVideo);
-  // Launch the default InCall activity
-  Context context= this.cordova.getActivity().getApplicationContext();
+  final RtcDialog dialog = Bit6.getInstance().startCall(to, isVideo);
+   // Launch the default InCall activity
+  final Context context= this.cordova.getActivity().getApplicationContext();
   dialog.launchInCallActivity(context);
 }
 
@@ -174,10 +186,6 @@ void getConversation(String other, final CallbackContext callbackContext){
   Cursor cursor;
 
   cursor = Bit6.getInstance().getConversation(address);
-
-  if(mMessageCursorAdapter == null) {
-      mMessageCursorAdapter = new MessageCursorAdapter(this.cordova.getActivity().getApplicationContext(), cursor, false);
-  }
 
   try {
    while (cursor.moveToNext()) {
@@ -226,33 +234,14 @@ void getConversations(final CallbackContext callbackContext){
 }
 }
 
-void conversations(final CallbackContext callbackContext){
-  try {
-   JSONArray conversations = new JSONArray();
-   Cursor cursor;
-   cursor = Bit6.getInstance().getConversations();
+void initDBListeners() {
+  Cursor cursor;
+  cursor = Bit6.getInstance().getConversations();
 
-   while (cursor.moveToNext()) {
-     JSONObject item = new JSONObject();
-     String userName = cursor.getString(cursor.getColumnIndex(Messages.OTHER));
-     String content = cursor.getString(cursor.getColumnIndex(Messages.CONTENT));
-     String stamp = cursor.getString(cursor.getColumnIndex(Messages.CREATED));
-
-     item.put("title", userName);
-     item.put("content", content);
-     item.put("stamp", stamp);
-     conversations.put(item);
-   }
-   JSONObject data = new JSONObject();
-   data.put("conversations", conversations);
-
-   callbackContext.success(data);
- }
- catch (JSONException e) {
-  callbackContext.error("Error: " + e.getMessage());
+  if(mConvCursorAdapter == null) {
+      mConvCursorAdapter = new MessageCursorAdapter(this.cordova.getActivity().getApplicationContext(), cursor, false);
+  }
 }
-}
-
 
 void isConnected(final CallbackContext callbackContext) {
   try {
@@ -299,5 +288,7 @@ void init() {
 
  IntentFilter i = new IntentFilter("com.bit6.ChatDemo.intent.INCOMING_CALL");
  this.cordova.getActivity().registerReceiver(new IncomingCallReceiver() , i);
+
+ initDBListeners();
 }
 }

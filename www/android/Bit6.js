@@ -54,6 +54,10 @@ Bit6.prototype.isConnected = function(success, error){
   exec(success, error, "Bit6", "isConnected", []);
 }
 
+Bit6.prototype.sendTypingNotification = function(to){
+  exec("", "", "Bit6", "sendTypingNotification", [to]);
+}
+
 Bit6.prototype.sendTextMessage = function(message, to, success, error){
   exec(success, error, "Bit6", "sendMessage", [message, to, 2]);
 }

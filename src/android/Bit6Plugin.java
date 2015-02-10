@@ -28,6 +28,7 @@ import com.bit6.sdk.Message;
 import com.bit6.sdk.Message.Messages;
 import com.bit6.sdk.RtcDialog;
 import com.bit6.sdk.MessageStatusListener;
+import com.bit6.sdk.RtNotificationListener;
 
 import com.bit6.ChatDemo.IncomingCallActivity;
 
@@ -45,7 +46,9 @@ public class Bit6Plugin extends CordovaPlugin {
   static final String IS_CONNECTED = "isConnected";
   static final String START_CALL = "startCallToAddress";
   static final String SEND_MESSAGE = "sendMessage";
+  static final String SEND_TYPING_NOTIFICATION = "sendTypingNotification";
   static final String START_LISTENING = "startListening";
+
 
 
   MessageCursorAdapter mConvCursorAdapter;
@@ -109,6 +112,10 @@ public class Bit6Plugin extends CordovaPlugin {
    }
    if (action.equals(SEND_MESSAGE)) {
      sendMessage(args.getString(0), args.getString(1), callbackContext);
+     return true;
+   }
+   if (action.equals(SEND_TYPING_NOTIFICATION)) {
+     sendTypingNotification(args.getString(0));
      return true;
    }
    if (action.equals(START_LISTENING)) {
@@ -177,6 +184,11 @@ void startCall(String other, final Boolean isVideo, final CallbackContext callba
    // Launch the default InCall activity
   final Context context= this.cordova.getActivity().getApplicationContext();
   dialog.launchInCallActivity(context);
+}
+
+//No callback for this case. Can be added later if needed.
+void sendTypingNotification(String dest) {
+  Bit6.getInstance().sendTypingNotification(Address.parse(dest));
 }
 
 void sendMessage(String message, String other, final CallbackContext callbackContext) {
@@ -277,6 +289,19 @@ void isConnected(final CallbackContext callbackContext) {
 void startListening(final CallbackContext callbackContext) {
   if (mNotificationCallback == null)
   mNotificationCallback = callbackContext;
+
+  initDBListeners();
+
+  Bit6.getInstance().addRtNotificationListener(new RtNotificationListener() {
+    public void onTypingReceived(String from) {
+        //Log.e("onTypingReceived()", from);
+         sendNotification("typingStarted");
+    }
+
+    public void onNotificationReceived(String from, String type, JSONObject data) {
+        //TODO
+    }
+  });
 }
 
 void sendNotification(final String notificationName) {
@@ -308,7 +333,5 @@ void init() {
 
  IntentFilter i = new IntentFilter("com.bit6.ChatDemo.intent.INCOMING_CALL");
  this.cordova.getActivity().registerReceiver(new IncomingCallReceiver() , i);
-
- initDBListeners();
 }
 }

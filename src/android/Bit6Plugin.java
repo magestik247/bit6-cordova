@@ -39,6 +39,7 @@ public class Bit6Plugin extends CordovaPlugin {
 
   static final String INIT = "init";
   static final String LOGIN = "login";
+  static final String SIGNUP = "signup";
   static final String GET_CONVERSATIONS = "conversations";
   static final String GET_CONVERSATION = "getConversation";
   static final String IS_CONNECTED = "isConnected";
@@ -90,6 +91,10 @@ public class Bit6Plugin extends CordovaPlugin {
      login(args.getString(0), args.getString(1), callbackContext);
      return true;
    }
+   if (action.equals(SIGNUP)) {
+     signup(args.getString(0), args.getString(1), callbackContext);
+     return true;
+   }
    if (action.equals(GET_CONVERSATIONS)) {
      getConversations(callbackContext);
      return true;
@@ -132,11 +137,26 @@ public class Bit6Plugin extends CordovaPlugin {
 
 
 
- void login(String username, String pass, final CallbackContext callbackContext) {
-
+void login(String username, String pass, final CallbackContext callbackContext) {
   Address identity = Address.fromParts(Address.KIND_USERNAME, username);
 
   Bit6.getInstance().login(identity, pass, new ResultCallback() {
+    @Override
+    public void onResult(boolean success, String msg) {
+      if (success) {
+        callbackContext.success(msg);
+      }
+      else {
+        callbackContext.error(msg);
+      }
+    }
+  });
+}
+
+void signup(String username, String pass, final CallbackContext callbackContext) {
+  Address identity = Address.fromParts(Address.KIND_USERNAME, username);
+
+  Bit6.getInstance().signup(identity, pass, new ResultCallback() {
     @Override
     public void onResult(boolean success, String msg) {
       if (success) {

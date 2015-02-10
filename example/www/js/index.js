@@ -126,7 +126,11 @@ function updateConversations() {
 function initButtonListeners() {
   $("#signup").click(function(){
     bit6.register($("#username").val(), $("#password").val(), function(success){
-      alert("Success:" + JSON.stringify(success));
+      var result = JSON.stringify(success);
+      if (result.indexOf("userid") > -1)
+        alert("Signed Up!");
+      else
+        alert(result);
     }
     , function(error){
       alert("Error:" + JSON.stringify(error));
@@ -135,7 +139,6 @@ function initButtonListeners() {
 
   $("#login").click(function(){
    //bit6.logout();
-   alert("mycheck: login clicked");
 
    bit6.login($("#username").val(), $("#password").val(), function(success){
      console.log(JSON.stringify(success));

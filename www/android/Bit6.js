@@ -13,10 +13,6 @@ Bit6.prototype.on = function(notification, callback){
      callbackMap[notification] = callback;
 }
 
-Bit6.prototype.register = function(gcmSenderId){
-  exec(bit6._notification, bit6._error, "Bit6", "register", [gcmSenderId]);
-}
-
 Bit6.prototype.init = function(){
   exec("", "", "Bit6", "init", []);
 }

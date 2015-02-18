@@ -12,7 +12,7 @@
 
     Bit6Address *identity = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:username];
 
-    [Bit6Session signUpWithUserIdentity:identity password:password completionHandler:^(NSDictionary *response, NSError *error) {
+    [Bit6.session signUpWithUserIdentity:identity password:password completionHandler:^(NSDictionary *response, NSError *error) {
        [self processCommandWithResult:command response:response error:error];
    }];
 }
@@ -24,21 +24,21 @@
 
     Bit6Address *identity = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:username];
 
-    [Bit6Session loginWithUserIdentity:identity password:password completionHandler:^(NSDictionary *response, NSError *error) {
+    [Bit6.session loginWithUserIdentity:identity password:password completionHandler:^(NSDictionary *response, NSError *error) {
         [self processCommandWithResult:command response:response error:error];
     }];
 }
 
 - (void)logout:(CDVInvokedUrlCommand*)command
 {
-    [Bit6Session logoutWithCompletionHandler:^(NSDictionary *response, NSError *error) {
+    [Bit6.session logoutWithCompletionHandler:^(NSDictionary *response, NSError *error) {
         [self processCommandWithResult:command response:response error:error];
     }];
 }
 
 - (void)isConnected:(CDVInvokedUrlCommand*)command
 {
-    if ([Bit6Session isConnected])
+    if (Bit6.session.authenticated)
         [self processCommandWithResult:command response:[NSDictionary dictionaryWithObjectsAndKeys:@(YES), @"connected", nil] error:nil];
     else
         [self processCommandWithResult:command response:[NSDictionary dictionaryWithObjectsAndKeys:@(NO), @"connected", nil] error:nil];

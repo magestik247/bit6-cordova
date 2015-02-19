@@ -59,7 +59,7 @@ var app = {
        bit6.on('messageReceived', onMessageReceived);
        bit6.on('typingStarted', onTypingStarted);
        bit6.on('typingStopped', onTypingStopped);
-       },
+      },
   };
 
 function onMessageReceived() {
@@ -101,6 +101,8 @@ function populateConversationWindow(conversation) {
     div.append("<p>" + messages[index].content + "</p>");
     $("#incoming").append($(div).html());
   }
+  //scroll to bottom
+  $("#incoming").scrollTop($("#incoming")[0].scrollHeight);
 }
 
 function onLoginDone() {
@@ -168,33 +170,28 @@ function initButtonListeners() {
        });
      });
 
-   //TODO: Use conversations api in proper way. This is just for testing
-   $("#getConv").click(function() {
-    bit6.conversations(
-      function(data){
-        var listToDisplay = "Convsersatioins: \n ";
-        for (var i = 0; i < data.conversations.length; ++i) {
-          console.log(data.conversations[i].displayName);
-          listToDisplay = listToDisplay.concat(data.conversations[i].displayName).concat("\n");
-        }
-        console.log(data);
-        alert(listToDisplay);
-      },
-      function(error){
-        alert("Error on getting conv" + error);
-      });
-  });
-
    $("#sendMessage").click(function(){
-    console.log("sending message to ", currentChatUri);
+
     bit6.sendTextMessage($("#message").val(), currentChatUri, function(success){
       //console.log(JSON.stringify(success));
-      alert(success);
       onMessageReceived();
     }, function(error){
       alert(JSON.stringify(error));
     });
+
+    $("#message").val("");
   });
+
+   $("#logout").click(function(){
+     switchToLoginScreen();
+     //TODO
+    //   bit6.logout(function(success){
+    //     //switchToLoginScreen();
+    // }, function(error){
+    //   alert(JSON.stringify(error));
+    // });
+  });
+
 
        // Key down event in compose input field
     $('#message').keydown(function() {
@@ -246,4 +243,10 @@ function switchToChatListScreen() {
   $("#loginScreen")[0].style.display = "none";
   $("#chatScreen")[0].style.display = "none";
   $("#chatListScreen")[0].style.display = "block";
+}
+
+function switchToLoginScreen() {
+  $("#loginScreen")[0].style.display = "block";
+  $("#chatScreen")[0].style.display = "none";
+  $("#chatListScreen")[0].style.display = "none";
 }

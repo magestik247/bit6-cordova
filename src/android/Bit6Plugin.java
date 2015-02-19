@@ -40,6 +40,7 @@ public class Bit6Plugin extends CordovaPlugin {
 
   static final String INIT = "init";
   static final String LOGIN = "login";
+  static final String LOGOUT = "logout";
   static final String SIGNUP = "signup";
   static final String GET_CONVERSATIONS = "conversations";
   static final String GET_CONVERSATION = "getConversation";
@@ -85,13 +86,17 @@ public class Bit6Plugin extends CordovaPlugin {
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
-    if (action.equals(INIT)) {
+   if (action.equals(INIT)) {
       init();
       callbackContext.success();
       return true;
-    }
-    if (action.equals(LOGIN)) {
+   }
+   if (action.equals(LOGIN)) {
      login(args.getString(0), args.getString(1), callbackContext);
+     return true;
+   }
+   if (action.equals(LOGOUT)) {
+     logout(callbackContext);
      return true;
    }
    if (action.equals(SIGNUP)) {
@@ -158,6 +163,12 @@ void login(String username, String pass, final CallbackContext callbackContext) 
       }
     }
   });
+}
+
+void logout(final CallbackContext callbackContext) {
+  Bit6.getInstance().logout();
+  //No callabck here, so just returning success
+  callbackContext.success("");
 }
 
 void signup(String username, String pass, final CallbackContext callbackContext) {

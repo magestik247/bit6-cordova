@@ -47,7 +47,7 @@ Bit6.prototype.login = function(username, password, success, error){
 }
 
 Bit6.prototype.logout = function(success, error){
-  exec(success, error, "Bit6", "logout");
+  exec(success, error, "Bit6", "logout", []);
 }
 
 Bit6.prototype.isConnected = function(success, error){

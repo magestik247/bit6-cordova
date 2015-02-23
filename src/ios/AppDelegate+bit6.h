@@ -8,8 +8,10 @@
 
 #import "AppDelegate.h"
 
+
 @interface AppDelegate (bit6)
 
 - (id) getCommandInstance:(NSString*)className;
+
 
 @end

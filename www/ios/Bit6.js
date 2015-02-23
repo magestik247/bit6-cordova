@@ -54,8 +54,7 @@ Bit6.prototype.conversations = function(success, error){
          if (latestMsg.content)
            c.content = latestMsg.content;
 
-        var d = new Date(latestMsg.updated);
-        c.stamp = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+         c.stamp = latestMsg.updated
         data.conversations[i] = c;
       }
     }

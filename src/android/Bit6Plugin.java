@@ -58,95 +58,93 @@ public class Bit6Plugin extends CordovaPlugin {
 
 
   class MessageCursorAdapter extends CursorAdapter {
-     MessageCursorAdapter (Context context, Cursor c, boolean autoRequery) {
-      super(context, c, autoRequery);
-    }
-
-    @Override
-    protected void onContentChanged() {
-        sendNotification("messageReceived");
-    }
-
-    @Override
-    public void  bindView(View v, Context cntx, Cursor c) {}
-    public View newView(Context cntx, Cursor c, ViewGroup vg) { return null; }
+   MessageCursorAdapter (Context context, Cursor c, boolean autoRequery) {
+    super(context, c, autoRequery);
   }
 
-  class IncomingCallReceiver extends BroadcastReceiver{
+  @Override
+  protected void onContentChanged() {
+    sendNotification("messageReceived");
+  }
+
+  @Override
+  public void  bindView(View v, Context cntx, Cursor c) {}
+  public View newView(Context cntx, Cursor c, ViewGroup vg) { return null; }
+}
+
+class IncomingCallReceiver extends BroadcastReceiver{
 
   @Override
   public void onReceive(Context context, Intent intent) {
-     Intent i = new Intent(context, IncomingCallActivity.class);
-     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-     i.putExtra(Bit6.INTENT_EXTRA_DIALOG, intent.getBundleExtra(Bit6.INTENT_EXTRA_DIALOG));
-     context.startActivity(i);
-  }
+   Intent i = new Intent(context, IncomingCallActivity.class);
+   i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+   i.putExtra(Bit6.INTENT_EXTRA_DIALOG, intent.getBundleExtra(Bit6.INTENT_EXTRA_DIALOG));
+   context.startActivity(i);
+ }
 }
 
-  @Override
-  public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+@Override
+public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
-   if (action.equals(INIT)) {
-      init();
-      callbackContext.success();
-      return true;
-   }
-   if (action.equals(LOGIN)) {
-     login(args.getString(0), args.getString(1), callbackContext);
-     return true;
-   }
-   if (action.equals(LOGOUT)) {
-     logout(callbackContext);
-     return true;
-   }
-   if (action.equals(SIGNUP)) {
-     signup(args.getString(0), args.getString(1), callbackContext);
-     return true;
-   }
-   if (action.equals(GET_CONVERSATIONS)) {
-     getConversations(callbackContext);
-     return true;
-   }
-   if (action.equals(GET_CONVERSATION)) {
-     getConversation(args.getString(0), callbackContext);
-     return true;
-   }
-   if (action.equals(START_CALL)) {
-     startCall(args.getString(0), args.getBoolean(1), callbackContext);
-     return true;
-   }
-   if (action.equals(SEND_MESSAGE)) {
-     sendMessage(args.getString(0), args.getString(1), callbackContext);
-     return true;
-   }
-   if (action.equals(SEND_TYPING_NOTIFICATION)) {
-     sendTypingNotification(args.getString(0));
-     return true;
-   }
-   if (action.equals(START_LISTENING)) {
-     startListening(callbackContext);
-     return true;
-   }
+ if (action.equals(INIT)) {
+  init();
+  callbackContext.success();
+  return true;
+}
+if (action.equals(LOGIN)) {
+ login(args.getString(0), args.getString(1), callbackContext);
+ return true;
+}
+if (action.equals(LOGOUT)) {
+ logout(callbackContext);
+ return true;
+}
+if (action.equals(SIGNUP)) {
+ signup(args.getString(0), args.getString(1), callbackContext);
+ return true;
+}
+if (action.equals(GET_CONVERSATIONS)) {
+ getConversations(callbackContext);
+ return true;
+}
+if (action.equals(GET_CONVERSATION)) {
+ getConversation(args.getString(0), callbackContext);
+ return true;
+}
+if (action.equals(START_CALL)) {
+ startCall(args.getString(0), args.getBoolean(1), callbackContext);
+ return true;
+}
+if (action.equals(SEND_MESSAGE)) {
+ sendMessage(args.getString(0), args.getString(1), callbackContext);
+ return true;
+}
+if (action.equals(SEND_TYPING_NOTIFICATION)) {
+ sendTypingNotification(args.getString(0));
+ return true;
+}
+if (action.equals(START_LISTENING)) {
+ startListening(callbackContext);
+ return true;
+}
+if (action.equals(IS_CONNECTED)) {
+ isConnected(callbackContext);
+ return true;
+}
 
-   if (action.equals(IS_CONNECTED)) {
-     isConnected(callbackContext);
-     return true;
-   }
+return false;
+}
 
-   return false;
- }
-
-   @Override
-   public void onPause(boolean multitasking) {
+@Override
+public void onPause(boolean multitasking) {
        //TODO: This needs to be fixed (requires some changes in sdk).
        //Commented out to make IncomingCallActivity/InCallScreen work, otherwise the connection is being lost
        //Bit6.getInstance().onBackground();
-   }
-   @Override
-   public void onResume(boolean multitasking) {
-       Bit6.getInstance().onForeground();
-   }
-
+}
+@Override
+public void onResume(boolean multitasking) {
+ Bit6.getInstance().onForeground();
+}
 
 
 void login(String username, String pass, final CallbackContext callbackContext) {
@@ -282,7 +280,7 @@ void initDBListeners() {
   cursor = Bit6.getInstance().getConversations();
 
   if(mConvCursorAdapter == null) {
-      mConvCursorAdapter = new MessageCursorAdapter(this.cordova.getActivity().getApplicationContext(), cursor, false);
+    mConvCursorAdapter = new MessageCursorAdapter(this.cordova.getActivity().getApplicationContext(), cursor, false);
   }
 }
 
@@ -299,20 +297,20 @@ void isConnected(final CallbackContext callbackContext) {
 
 void startListening(final CallbackContext callbackContext) {
   if (mNotificationCallback == null)
-  mNotificationCallback = callbackContext;
+    mNotificationCallback = callbackContext;
 
   initDBListeners();
 
   Bit6.getInstance().addRtNotificationListener(new RtNotificationListener() {
     public void onTypingReceived(String from) {
         //Log.e("onTypingReceived()", from);
-         sendNotification("typingStarted");
-    }
+     sendNotification("typingStarted");
+   }
 
-    public void onNotificationReceived(String from, String type, JSONObject data) {
+   public void onNotificationReceived(String from, String type, JSONObject data) {
         //TODO
-    }
-  });
+   }
+ });
 }
 
 void sendNotification(final String notificationName) {

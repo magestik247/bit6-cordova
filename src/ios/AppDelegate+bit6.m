@@ -2,7 +2,19 @@
 #import <Bit6SDK/Bit6SDK.h>
 #import <objc/runtime.h>
 
+
 @implementation AppDelegate (bit6)
+
+//This is used as workaround to not extend AppDelegate from Bit6ApplicatonManager
+static Bit6ApplicationManager *appManager = nil;
+
+- (id)getAppManager
+{
+    if (appManager == nil)
+      appManager = [[Bit6ApplicationManager alloc] init];
+
+    return appManager;
+}
 
 
 // its dangerous to override a method from within a category.
@@ -43,11 +55,14 @@
     return [self.viewController getCommandInstance:className];
 }
 
-// - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
-// {
-//     NSLog(@"didReceiveRemoteNotification");
-//     [[NSNotificationCenter defaultCenter] postNotificationName:Bit6RemoteNotificationReceived object:nil userInfo:userInfo];
-// }
+
+- (void)application:(UIApplication *)application
+        didReceiveRemoteNotification:(NSDictionary *)userInfo
+              fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler
+{
+    [[self getAppManager] didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
+}
+
 
 - (void) application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {

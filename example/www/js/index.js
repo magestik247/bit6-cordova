@@ -63,7 +63,6 @@ var app = {
   };
 
 function onMessageReceived() {
-  //alert("Got notification");
    if (currentChatUri)
     updateCurrentChat();
    updateConversations();
@@ -183,17 +182,14 @@ function initButtonListeners() {
   });
 
    $("#logout").click(function(){
-     switchToLoginScreen();
-     //TODO
-    //   bit6.logout(function(success){
-    //     //switchToLoginScreen();
-    // }, function(error){
-    //   alert(JSON.stringify(error));
-    // });
+       bit6.logout(function(success){
+        switchToLoginScreen();
+     }, function(error){
+       alert(JSON.stringify(error));
+     });
   });
 
-
-       // Key down event in compose input field
+    // Key down event in compose input field
     $('#message').keydown(function() {
         var now = Date.now();
         if (now - lastTypingSent > 7000) {
@@ -212,7 +208,9 @@ for(var i=0; i < conversations.length; i++) {
     currentChatUri = c.uri;
   }
   var latestText = c.content;
-  var stamp = c.stamp;
+
+  var d = new Date(Number(c.stamp));
+  var stamp = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
 
   chatList.append(
     $('<div />')

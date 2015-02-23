@@ -33,6 +33,8 @@
     <resource-file src="lib/ios/Bit6SDK.framework/Resources/Bit6Resources.bundle" />
 
     <header-file src="lib/ios/Bit6SDK.framework/Headers/Bit6SDK.h"/>
+    <header-file src="lib/ios/Bit6SDK.framework/Headers/Bit6ApplicationManager.h"/>
+
     <header-file src="src/ios/AppDelegate+bit6.h" />
     <source-file src="src/ios/AppDelegate+bit6.m" compiler-flags="-ObjC" />
     <header-file src="src/ios/CDVBit6.h" />

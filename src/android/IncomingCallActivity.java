@@ -8,11 +8,11 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.os.Handler;
 
 import com.bit6.sdk.Bit6;
 import com.bit6.sdk.Ringer;
 import com.bit6.sdk.RtcDialog;
-import com.bit6.sdk.WakeLocker;
 
 public class IncomingCallActivity extends Activity implements RtcDialog.StateListener, OnClickListener {
 
@@ -64,14 +64,12 @@ public class IncomingCallActivity extends Activity implements RtcDialog.StateLis
 	@Override
 	protected void onStart() {
 		super.onStart();
-		WakeLocker.acquire(this);
 		ringer.playRinging();
 	}
 
 	@Override
 	protected void onStop() {
 		ringer.stop();
-		WakeLocker.release();
 		super.onStop();
 	}
 
@@ -109,4 +107,21 @@ public class IncomingCallActivity extends Activity implements RtcDialog.StateLis
 			finish();
 		}
 	}
+
+	// @Override
+    public void onPause() {
+       super.onPause();
+       new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				Bit6.getInstance().onBackground();
+			}
+		}, 5000);
+    }
+
+    @Override
+    public void onResume() {
+       super.onResume();
+       Bit6.getInstance().onForeground();
+    }
 }

@@ -170,6 +170,7 @@
     <source-file src="src/android/Bit6Plugin.java" target-dir="src/com/bit6/ChatDemo"/>
     <source-file src="src/android/IncomingMessageReceiver.java" target-dir="src/com/bit6/ChatDemo"/>
     <source-file src="src/android/IncomingCallActivity.java" target-dir="src/com/bit6/ChatDemo"/>
+    <source-file src="src/android/LifecycleHelper.java" target-dir="src/com/bit6/ChatDemo"/>
     <source-file src="src/android/Bit6App.java" target-dir="src/com/bit6/sdk"/>
 
   </platform>

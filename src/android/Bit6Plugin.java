@@ -31,6 +31,7 @@ import com.bit6.sdk.MessageStatusListener;
 import com.bit6.sdk.RtNotificationListener;
 
 import com.bit6.ChatDemo.IncomingCallActivity;
+import com.bit6.ChatDemo.LifecycleHelper;
 
 
 /**
@@ -55,6 +56,8 @@ public class Bit6Plugin extends CordovaPlugin {
   MessageCursorAdapter mConvCursorAdapter;
   MessageCursorAdapter mMessageCursorAdapter;
   CallbackContext mNotificationCallback;
+
+  boolean isInCallingState = false;
 
 
   class MessageCursorAdapter extends CursorAdapter {
@@ -137,15 +140,14 @@ return false;
 
 @Override
 public void onPause(boolean multitasking) {
-       //TODO: This needs to be fixed (requires some changes in sdk).
-       //Commented out to make IncomingCallActivity/InCallScreen work, otherwise the connection is being lost
-       //Bit6.getInstance().onBackground();
+  if (!isInCallingState)
+   LifecycleHelper.getInstance().onBackground();
 }
 @Override
 public void onResume(boolean multitasking) {
- Bit6.getInstance().onForeground();
+  isInCallingState = false;
+  LifecycleHelper.getInstance().onForeground();
 }
-
 
 void login(String username, String pass, final CallbackContext callbackContext) {
   Address identity = Address.fromParts(Address.KIND_USERNAME, username);
@@ -186,11 +188,10 @@ void signup(String username, String pass, final CallbackContext callbackContext)
 }
 
 void startCall(String other, final Boolean isVideo, final CallbackContext callbackContext) {
-
-  Bit6.getInstance().onForeground();
+  isInCallingState = true;
   Address to = Address.parse(other);
   final RtcDialog dialog = Bit6.getInstance().startCall(to, isVideo);
-   // Launch the default InCall activity
+  //Launch the default InCall activity
   final Context context= this.cordova.getActivity().getApplicationContext();
   dialog.launchInCallActivity(context);
 }

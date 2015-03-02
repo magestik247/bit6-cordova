@@ -14,6 +14,8 @@ import com.bit6.sdk.Bit6;
 import com.bit6.sdk.Ringer;
 import com.bit6.sdk.RtcDialog;
 
+import com.bit6.ChatDemo.LifecycleHelper;
+
 public class IncomingCallActivity extends Activity implements RtcDialog.StateListener, OnClickListener {
 
 	private RtcDialog dialog;
@@ -92,7 +94,7 @@ public class IncomingCallActivity extends Activity implements RtcDialog.StateLis
 			// dialog.setAsIntentExtra(intent);
 			// startActivity(intent);
 
-			finish();
+			//finish();
 		}
 		else if (v == reject) {
 			ringer.stop();
@@ -108,20 +110,15 @@ public class IncomingCallActivity extends Activity implements RtcDialog.StateLis
 		}
 	}
 
-	// @Override
-    public void onPause() {
-       super.onPause();
-       new Handler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				Bit6.getInstance().onBackground();
-			}
-		}, 5000);
-    }
+	//@Override
+    // public void onPause() {
+    //    super.onPause();
+    //    LifecycleHelper.getInstance().onBackground();
+    // }
 
     @Override
     public void onResume() {
        super.onResume();
-       Bit6.getInstance().onForeground();
+       LifecycleHelper.getInstance().onForeground();
     }
 }

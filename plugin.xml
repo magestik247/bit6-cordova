@@ -66,7 +66,7 @@
   </config-file>
 
   <config-file parent="/*" target="res/xml/config.xml">
-    <feature name="Bit6"><param name="android-package" value="com.bit6.ChatDemo.Bit6Plugin" />
+    <feature name="Bit6"><param name="android-package" value="com.bit6.sdk.plugin.Bit6Plugin" />
   </feature>
 </config-file>
 
@@ -119,7 +119,7 @@
      android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
    </activity>
 
-   <activity android:name="com.bit6.ChatDemo.IncomingCallActivity"
+   <activity android:name="com.bit6.sdk.plugin.IncomingCallActivity"
     android:launchMode="singleTop" >
    </activity>
 
@@ -167,11 +167,11 @@
       <source-file src="lib/android/libjingle_peerconnection.jar" target-dir="libs"/>
     -->
 
-    <source-file src="src/android/Bit6Plugin.java" target-dir="src/com/bit6/ChatDemo"/>
-    <source-file src="src/android/IncomingMessageReceiver.java" target-dir="src/com/bit6/ChatDemo"/>
-    <source-file src="src/android/IncomingCallActivity.java" target-dir="src/com/bit6/ChatDemo"/>
-    <source-file src="src/android/LifecycleHelper.java" target-dir="src/com/bit6/ChatDemo"/>
-    <source-file src="src/android/Bit6App.java" target-dir="src/com/bit6/sdk"/>
+    <source-file src="src/android/Bit6Plugin.java" target-dir="src/com/bit6/sdk/plugin"/>
+    <source-file src="src/android/IncomingMessageReceiver.java" target-dir="src/com/bit6/sdk/plugin"/>
+    <source-file src="src/android/IncomingCallActivity.java" target-dir="src/com/bit6/sdk/plugin"/>
+    <source-file src="src/android/LifecycleHelper.java" target-dir="src/com/bit6/sdk/plugin"/>
+    <source-file src="src/android/Bit6App.java" target-dir="src/com/bit6/sdk/plugin"/>
 
   </platform>
 

@@ -1,4 +1,4 @@
-package com.bit6.sdk;
+package com.bit6.sdk.plugin;
 
 import android.app.Activity;
 import android.app.Application;

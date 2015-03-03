@@ -1,4 +1,4 @@
-package com.bit6.ChatDemo;
+package com.bit6.sdk.plugin;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -30,8 +30,8 @@ import com.bit6.sdk.RtcDialog;
 import com.bit6.sdk.MessageStatusListener;
 import com.bit6.sdk.RtNotificationListener;
 
-import com.bit6.ChatDemo.IncomingCallActivity;
-import com.bit6.ChatDemo.LifecycleHelper;
+import com.bit6.sdk.plugin.IncomingCallActivity;
+import com.bit6.sdk.plugin.LifecycleHelper;
 
 
 /**

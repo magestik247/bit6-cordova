@@ -1,4 +1,4 @@
-package com.bit6.ChatDemo;
+package com.bit6.sdk.plugin;
 
 import android.os.Handler;
 import com.bit6.sdk.Bit6;

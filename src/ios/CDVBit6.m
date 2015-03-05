@@ -104,19 +104,22 @@
     //TOOD: Should support all kinds, not only username.
     Bit6Address *address = [Bit6Address addressWithKind:Bit6AddressKind_USERNAME value:to];
     BOOL hasVideo = [[command.arguments objectAtIndex:1] boolValue];
-    Bit6CallController *callController = [Bit6 startCallToAddress:address hasVideo:NO];
+    Bit6CallController *callController = [Bit6 startCallToAddress:address hasVideo:hasVideo];
     //UIViewController *vc = nil; //create a custom viewcontroller or nil to use the default one
 
+    Bit6CallViewController *callVC = [Bit6CallViewController createDefaultCallViewController];
+
     if (callController){
-        [callController connectToViewController:nil completion:^(UIViewController *viewController, NSError *error) {
-            if (error) {
-                [[[UIAlertView alloc] initWithTitle:error.localizedDescription message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-            }
-            else {
-                //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(callStateChangedNotification:) name:Bit6CallStateChangedNotification object:callController];
-                [[[[UIApplication sharedApplication] windows][0] rootViewController] presentViewController:viewController animated:YES completion:nil];
-            }
-        }];
+
+
+         [callController addObserver:self forKeyPath:@"callState" options:NSKeyValueObservingOptionOld context:NULL];
+
+        //use a custom in-call UIViewController
+        //MyCallViewController *callVC = [[MyCallViewController alloc] init];
+
+        //start the call
+        [callController connectToViewController:callVC];
+
     }
     else {
         NSLog(@"Call failed");
@@ -261,6 +264,38 @@
 
     return mutableArray;
 }
+
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([object isKindOfClass:[Bit6CallController class]]) {
+        if ([keyPath isEqualToString:@"callState"]) {
+            [self callStateChangedNotification:object];
+        }
+    }
+}
+
+- (void) callStateChangedNotification:(Bit6CallController*)callController
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //the call is starting: show the viewController
+        if (callController.callState == Bit6CallState_PROGRESS) {
+            [Bit6 presentCallController:callController];
+        }
+        //the call ended: remove the observer and dismiss the viewController
+        else if (callController.callState == Bit6CallState_END) {
+            [callController removeObserver:self forKeyPath:@"callState"];
+            [Bit6 dismissCallController:callController];
+        }
+        //the call ended with an error: remove the observer and dismiss the viewController
+        else if (callController.callState == Bit6CallState_ERROR) {
+            [callController removeObserver:self forKeyPath:@"callState"];
+            [Bit6 dismissCallController:callController];
+            [[[UIAlertView alloc] initWithTitle:@"An Error Occurred" message:callController.error.localizedDescription?:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+        }
+    });
+}
+
 
 @end
 

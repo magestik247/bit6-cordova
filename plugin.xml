@@ -30,6 +30,23 @@
     <framework src="GLKit.framework"/>
     <framework src="lib/ios/Bit6SDK.framework" custom="true"/>
 
+      <framework src="CoreMedia.framework"/>
+      <framework src="AudioToolbox.framework"/>
+      <framework src="AVFoundation.framework"/>
+      <framework src="AssetsLibrary.framework"/>
+      <framework src="SystemConfiguration.framework"/>
+      <framework src="MediaPlayer.framework"/>
+      <framework src="OpenGLES.framework"/>
+      <framework src="CoreVideo.framework"/>
+      <framework src="QuartzCore.framework"/>
+      <framework src="CoreLocation.framework"/>
+      <framework src="Security.framework"/>
+      <framework src="CFNetwork.framework"/>
+      <framework src="Foundation.framework"/>
+
+
+
+
     <resource-file src="lib/ios/Bit6SDK.framework/Resources/Bit6Resources.bundle" />
 
     <header-file src="lib/ios/Bit6SDK.framework/Headers/Bit6SDK.h"/>

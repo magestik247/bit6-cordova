@@ -113,8 +113,6 @@
   <uses-feature android:name="android.hardware.camera.autofocus" />
   <uses-feature android:name="android.hardware.camera" />
 
-
-
   <permission
     android:name="com.bit6.permission.C2D_MESSAGE"
     android:protectionLevel="signature" />
@@ -125,7 +123,7 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
 
-    <application android:name="com.bit6.sdk.Bit6App"/>
+  <application android:name="com.bit6.sdk.plugin.Bit6App"/>
 
   </config-file>
 
@@ -154,23 +152,24 @@
 
         <!-- Receives the actual messages. -->
         <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+        <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
         <category android:name="com.bit6" />
       </intent-filter>
     </receiver>
+    <service android:name=".GcmIntentService" />
 
 <!--
     <receiver android:name=".IncomingMessageReceiver" android:enabled="true">
     <intent-filter>
-        <action android:name="com.bit6.sdk.intent.INCOMING_MESSAGE"></action>
+        <action android:name="com.bit6.ChatDemo.intent.INCOMING_MESSAGE"></action>
     </intent-filter>
     </receiver>
-
-   <receiver android:name=".IncomingCallReceiver" android:enabled="true">
+-->
+   <receiver android:name="com.bit6.sdk.plugin.IncomingCallReceiver" android:enabled="true">
       <intent-filter>
-          <action android:name="com.bit6.ChatDemo.INCOMING_CALL"></action>
+          <action android:name="com.bit6.ChatDemo.intent.INCOMING_CALL"></action>
       </intent-filter>
   </receiver>
--->
 
     <service android:name="com.bit6.sdk.gcm.GcmIntentService" />
 
@@ -187,6 +186,7 @@
     <source-file src="src/android/Bit6Plugin.java" target-dir="src/com/bit6/sdk/plugin"/>
     <source-file src="src/android/IncomingMessageReceiver.java" target-dir="src/com/bit6/sdk/plugin"/>
     <source-file src="src/android/IncomingCallActivity.java" target-dir="src/com/bit6/sdk/plugin"/>
+    <source-file src="src/android/IncomingCallReceiver.java" target-dir="src/com/bit6/sdk/plugin"/>
     <source-file src="src/android/LifecycleHelper.java" target-dir="src/com/bit6/sdk/plugin"/>
     <source-file src="src/android/Bit6App.java" target-dir="src/com/bit6/sdk/plugin"/>
 

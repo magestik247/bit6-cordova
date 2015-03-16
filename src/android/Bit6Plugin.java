@@ -45,7 +45,7 @@ public class Bit6Plugin extends CordovaPlugin {
   static final String SIGNUP = "signup";
   static final String GET_CONVERSATIONS = "conversations";
   static final String GET_CONVERSATION = "getConversation";
-  static final String IS_CONNECTED = "isConnected";
+  static final String IS_AUTHENTICATED = "isAuthenticated";
   static final String START_CALL = "startCallToAddress";
   static final String SEND_MESSAGE = "sendMessage";
   static final String SEND_TYPING_NOTIFICATION = "sendTypingNotification";
@@ -119,8 +119,8 @@ if (action.equals(START_LISTENING)) {
  startListening(callbackContext);
  return true;
 }
-if (action.equals(IS_CONNECTED)) {
- isConnected(callbackContext);
+if (action.equals(IS_AUTHENTICATED)) {
+ isAuthenticated(callbackContext);
  return true;
 }
 
@@ -274,7 +274,7 @@ void initDBListeners() {
   }
 }
 
-void isConnected(final CallbackContext callbackContext) {
+void isAuthenticated(final CallbackContext callbackContext) {
   try {
     JSONObject response = new JSONObject();
     response.put("connected", Bit6.getInstance().isAuthenticated());

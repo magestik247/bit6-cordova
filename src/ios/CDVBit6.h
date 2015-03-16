@@ -6,7 +6,7 @@
 - (void)signup:(CDVInvokedUrlCommand*)command;
 - (void)login:(CDVInvokedUrlCommand*)command;
 - (void)logout:(CDVInvokedUrlCommand*)command;
-- (void)isConnected:(CDVInvokedUrlCommand*)command;
+- (void)isAuthenticated:(CDVInvokedUrlCommand*)command;
 - (void)startCallToAddress:(CDVInvokedUrlCommand*)command;
 - (void)sendMessage:(CDVInvokedUrlCommand*)command;
 - (void)sendTypingNotification:(CDVInvokedUrlCommand*)command;

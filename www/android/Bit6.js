@@ -38,7 +38,7 @@ Bit6.prototype.stopListening = function(){
     exec(null, null, "Bit6", "stopListen", []);
 }
 
-Bit6.prototype.register = function(username, password, success, error){
+Bit6.prototype.signup = function(username, password, success, error){
   exec(success, error, "Bit6", "signup", [username, password]);
 }
 
@@ -50,8 +50,8 @@ Bit6.prototype.logout = function(success, error){
   exec(success, error, "Bit6", "logout", []);
 }
 
-Bit6.prototype.isConnected = function(success, error){
-  exec(success, error, "Bit6", "isConnected", []);
+Bit6.prototype.isAuthenticated = function(success, error){
+  exec(success, error, "Bit6", "isAuthenticated", []);
 }
 
 Bit6.prototype.sendTypingNotification = function(to){

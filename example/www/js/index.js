@@ -45,14 +45,14 @@ var app = {
 
       initButtonListeners();
 
-      bit6.isConnected(
+      bit6.isAuthenticated(
         function(response){
           console.log(response);
           if (response.connected)
            onLoginDone();
         },
         function(error){
-          alert("Error on isConnected api call");
+          alert("Error on isAuthenticated api call");
       });
 
        //adding notification callbacks
@@ -126,7 +126,7 @@ function updateConversations() {
 
 function initButtonListeners() {
   $("#signup").click(function(){
-    bit6.register($("#username").val(), $("#password").val(), function(success){
+    bit6.signup($("#username").val(), $("#password").val(), function(success){
       var result = JSON.stringify(success);
       if (result.indexOf("userid") > -1)
         alert("Signed Up!");

@@ -36,7 +36,7 @@
     }];
 }
 
-- (void)isConnected:(CDVInvokedUrlCommand*)command
+- (void)isAuthenticated:(CDVInvokedUrlCommand*)command
 {
     if (Bit6.session.authenticated)
         [self processCommandWithResult:command response:[NSDictionary dictionaryWithObjectsAndKeys:@(YES), @"connected", nil] error:nil];
@@ -166,7 +166,6 @@
 
 - (void) messagesUpdatedNotification:(NSNotification*)notification
 {
-    NSLog(@"Info: Received messagesUpdatedNotification");
     NSDictionary *data = [NSDictionary dictionaryWithObject:@"messageReceived" forKey:@"notification"];
 
     if (self.callbackId) {

@@ -6,6 +6,7 @@
   <name>Bit6</name>
 
   <preference name="API_KEY" />
+  <preference name="APP_PACKAGE" />
 
   <engines>
     <engine name="cordova" version=">=3.0.0"/>
@@ -56,11 +57,9 @@
     <source-file src="src/ios/AppDelegate+bit6.m" compiler-flags="-ObjC" />
     <header-file src="src/ios/CDVBit6.h" />
     <source-file src="src/ios/CDVBit6.m" linker-flags="-stdlib=libc++" />
-
     <config-file target="*-Info.plist" parent="API_KEY">
       <string>$API_KEY</string>
     </config-file>
-
   </platform>
 
   <platform name="android">
@@ -80,6 +79,7 @@
 
   <config-file target="res/values/bit6.xml" parent="/*">
     <string name="app_key">$API_KEY</string>
+    <string name="app_package">$APP_PACKAGE</string>
   </config-file>
 
   <config-file parent="/*" target="res/xml/config.xml">
@@ -138,10 +138,9 @@
     android:launchMode="singleTop" >
    </activity>
 
-
    <provider
     android:name="com.bit6.sdk.Bit6ContentProvider"
-    android:authorities="com.bit6.ChatDemo"
+    android:authorities="$APP_PACKAGE"
     android:exported="false" />
     <meta-data android:name="com.google.android.gms.version" android:value="6171000" />
 
@@ -158,21 +157,12 @@
     </receiver>
     <service android:name=".GcmIntentService" />
 
-<!--
-    <receiver android:name=".IncomingMessageReceiver" android:enabled="true">
-    <intent-filter>
-        <action android:name="com.bit6.ChatDemo.intent.INCOMING_MESSAGE"></action>
-    </intent-filter>
-    </receiver>
--->
    <receiver android:name="com.bit6.sdk.plugin.IncomingCallReceiver" android:enabled="true">
       <intent-filter>
-          <action android:name="com.bit6.ChatDemo.intent.INCOMING_CALL"></action>
+          <action android:name="$APP_PACKAGE.intent.INCOMING_CALL"></action>
       </intent-filter>
   </receiver>
-
     <service android:name="com.bit6.sdk.gcm.GcmIntentService" />
-
   </config-file>
 
     <!--  <source-file src="lib/android/armeabi-v7a/libjingle_peerconnection_so.so" target-dir="libs/armeabi-v7a"/>
